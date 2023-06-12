@@ -23,6 +23,9 @@ while ifGameGoing and not ifGameStarted:  # 主界面循环
     for event in pygame.event.get():  # 遍历事件
         if event.type == pygame.QUIT:  # 退出事件
             ifGameGoing = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                ifGameGoing = False
         if event.type == pygame.MOUSEBUTTONDOWN and not ifGameStarted:
             ifGameStarted = True
 mainScreen.fill((150, 150, 150))  # 游戏开始初始化
