@@ -33,7 +33,7 @@ pygame.display.update()
 gameMap = numpy.random.randint(0, 4, (10, 10))
 for i in range(9):
     for j in range(9):
-        mapBlock = pygame.Rect(100 + i * 50, 100 + j * 50, 40, 40)
+        mapBlock = pygame.Rect(mainScreen.get_width() / 2 - 250 + i * 50, mainScreen.get_height() / 2 - 250 + j * 50, 40, 40)
         if gameMap[i, j] == 0:
             blockColor = WHITE
         elif gameMap[i, j] == 1:
