@@ -119,6 +119,8 @@ while ifGameGoing:  # 游戏开始循环
             elif event.key == pygame.K_k:
                 unitNum += 1
                 nowUnit = test_group.sprites()[unitNum % groupLength]
+            elif event.key == pygame.K_ESCAPE:
+                ifGameGoing = False
         if ifRoundEnd:
             numOfRound += 1
             ifRoundEnd = False
