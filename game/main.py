@@ -1,21 +1,25 @@
 import pygame
 import numpy
 
-# import time
-
 pygame.init()  # 初始化pygame
-gameClock = pygame.time.Clock()
-mainScreen = pygame.display.set_mode((1280, 720))  # Pygame窗口
-pygame.display.set_caption("文明6_低配版")  # 标题
-ifGameGoing = True
+
 RED = (255, 0, 0)  # 红色，使用RGB颜色
 BLACK = (0, 0, 0)  # 黑色
 GREEN = (0, 255, 0)  # 绿色
 BLUE = (0, 0, 255)  # 蓝色
 WHITE = (255, 255, 255)  # 白色
+
+gameClock = pygame.time.Clock()
+windowsize = (1280, 720)
+mainScreen = pygame.display.set_mode(windowsize)  # Pygame窗口
+pygame.display.set_caption("文明6_低配版")  # 标题
+ifGameGoing = True
+
+
 mainBackgroundPic = pygame.image.load("./image/logo.jpg")  # 加载图片
+nextturn = pygame.image.load("./image/turn.png")
 pygame.mixer.music.load("music/menu.mp3")  # 加载音乐
-pygame.mixer.music.play(-1)  # 播放音乐
+pygame.mixer.music.play()  # 播放音乐
 
 
 class Unit(pygame.sprite.Sprite):
@@ -61,6 +65,8 @@ ifGameStarted = False
 font = pygame.font.Font(None, 60)
 mainScreen.blit(mainBackgroundPic, (0, 0))
 pygame.display.flip()
+
+
 while ifGameGoing and not ifGameStarted:  # 主界面循环
     for event in pygame.event.get():  # 遍历事件
         if event.type == pygame.QUIT:  # 退出事件
@@ -71,8 +77,11 @@ while ifGameGoing and not ifGameStarted:  # 主界面循环
         if event.type == pygame.MOUSEBUTTONDOWN and not ifGameStarted:
             ifGameStarted = True
     pygame.display.update()
+
+pygame.mixer.music.stop()#停止播放音乐
 gameMap = [[Block() for i in range(10)] for j in range(10)]  # 格子类数组
 ranTemp = numpy.random.randint(0, 4, (10, 10))
+
 for i in range(10):
     for j in range(10):
         mapBlockDis = pygame.Rect(100 + i * 50, 100 + j * 50, 40, 40)
@@ -97,6 +106,10 @@ test_group = pygame.sprite.Group()
 createUnit(5, 5, 5, BLACK, test_group, gameMap)
 createUnit(5, 4, 5, BLACK, test_group, gameMap)
 nowUnit = test_group.sprites()[unitNum]
+
+next_turn_area = pygame.Rect((1200, 600), windowsize) # 下一回合点击区域
+
+
 while ifGameGoing:  # 游戏开始循环
     for event in pygame.event.get():
         groupLength = len(test_group.sprites())
@@ -111,7 +124,7 @@ while ifGameGoing:  # 游戏开始循环
                 nowUnit.move(0, -1, gameMap)
             elif event.key == pygame.K_DOWN:
                 nowUnit.move(0, 1, gameMap)
-            elif event.key == pygame.K_RETURN:
+            elif event.key == pygame.K_RETURN:#回车下一回合
                 ifRoundEnd = True
             elif event.key == pygame.K_j:
                 unitNum -= 1
@@ -121,19 +134,26 @@ while ifGameGoing:  # 游戏开始循环
                 nowUnit = test_group.sprites()[unitNum % groupLength]
             elif event.key == pygame.K_ESCAPE:
                 ifGameGoing = False
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:#点击下一回合
+            mouse_pos = pygame.mouse.get_pos()
+            if next_turn_area.collidepoint(mouse_pos):
+                ifRoundEnd = True
         if ifRoundEnd:
             numOfRound += 1
             ifRoundEnd = False
             for a in test_group:
                 a.restMoveStep = a.maxMoveStep
             unitNum = 0
-        mainScreen.fill((150, 150, 150))  # 绘制部分
+        
+        mainScreen.fill((150, 150, 150))  # 循环的绘制部分
         textRestStep = font.render(str(nowUnit.restMoveStep), True, BLACK)
         mainScreen.blit(textRestStep, (1000, 100))
         textRound = font.render(str(numOfRound), True, BLACK)
         mainScreen.blit(textRound, (1000, 200))
         textNow = font.render(str(unitNum % groupLength + 1) + '/' + str(groupLength), True, BLACK)
         mainScreen.blit(textNow, (1000, 300))
+        mainScreen.blit(nextturn, (1200,600)) # 下一回合按钮
+        
         for i in range(10):
             for j in range(10):
                 mapBlockDis = pygame.Rect(100 + i * 50, 100 + j * 50, 40, 40)
