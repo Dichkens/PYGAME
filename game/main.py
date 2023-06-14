@@ -9,7 +9,7 @@ GREEN = (0, 255, 0)  # 绿色
 BLUE = (0, 0, 255)  # 蓝色
 WHITE = (255, 255, 255)  # 白色
 
-gameClock = pygame.time.Clock()
+gameClock = pygame.time.Clock()  # test
 windowsize = (1280, 720)
 mainScreen = pygame.display.set_mode(windowsize)  # Pygame窗口
 pygame.display.set_caption("文明6_低配版")  # 标题
