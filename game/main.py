@@ -46,14 +46,6 @@ class Unit(pygame.sprite.Sprite):
         self.life = 0
 
     def dead(self):
-        self.rect.x = -100
-        self.rect.y = -100
-        self.placeX = -1
-        self.placeY = -1
-        self.restMoveStep = 0
-        self.maxMoveStep = 0
-        self.attack = 0
-        self.life = 0
         self.remove(test_group)
 
     def move(self, xmove, ymove, block):
@@ -71,22 +63,16 @@ class Unit(pygame.sprite.Sprite):
                 for unit in test_group.sprites():  # 遍历组中的成员判断攻击对象
                     if unit.placeX == self.placeX + xmove and unit.placeY == self.placeY + ymove:
                         break
-                ifdead = 0
                 self.restMoveStep = 0
                 unit.life -= self.attack
                 if unit.life <= 0:
                     block[unit.placeX][unit.placeY].ifArmyUnit = False
                     unit.dead()
                     self.move(xmove, ymove, block)
-                if self.life == 1:
-                    ifdead = 1
                 self.life -= unit.attack + 1
                 if self.life <= 0:
-                    if ifdead:
-                        block[self.placeX][self.placeY].ifArmyUnit = False
-                        self.dead()
-                    else:
-                        self.life = 1
+                    block[self.placeX][self.placeY].ifArmyUnit = False
+                    self.dead()
 
 
 class Building(pygame.sprite.Sprite):
