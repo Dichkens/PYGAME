@@ -44,7 +44,7 @@ class Unit(pygame.sprite.Sprite):
         self.rect.y = 36 + self.placeY * 70
         self.attack = 0
         self.life = 0
-        
+
     def dead(self):
         self.rect.x = -100
         self.rect.y = -100
@@ -57,8 +57,8 @@ class Unit(pygame.sprite.Sprite):
         self.remove(test_group)
 
     def move(self, xmove, ymove, block):
-        if 0 <= self.placeX + xmove <= 9 and 0 <= self.placeY + ymove <= 9:
-            if not block[self.placeX + xmove][self.placeY + ymove].ifArmyUnit:
+        if 0 <= self.placeX + xmove <= 9 and 0 <= self.placeY + ymove <= 9:  # 移动是否越界
+            if not block[self.placeX + xmove][self.placeY + ymove].ifArmyUnit:  # 如果移动位置没人 执行移动
                 if block[self.placeX + xmove][self.placeY + ymove].moveCost <= self.restMoveStep:
                     block[self.placeX][self.placeY].ifArmyUnit = False
                     self.placeX += xmove
@@ -67,29 +67,27 @@ class Unit(pygame.sprite.Sprite):
                     block[self.placeX][self.placeY].ifArmyUnit = True
                     self.rect.x = 36 + self.placeX * 70
                     self.rect.y = 36 + self.placeY * 70
-            elif self.restMoveStep != 0:
-                for unit in test_group.sprites():
+            elif self.restMoveStep != 0:  # 如果移动位置有人且剩余步数不为0
+                for unit in test_group.sprites():  # 遍历组中的成员判断攻击对象
                     if unit.placeX == self.placeX + xmove and unit.placeY == self.placeY + ymove:
                         break
-                dead = 0
+                ifdead = 0
                 self.restMoveStep = 0
                 unit.life -= self.attack
                 if unit.life <= 0:
-                    unit.dead()
                     block[unit.placeX][unit.placeY].ifArmyUnit = False
-                    self.placeX += xmove
-                    self.placeY += ymove
-                    self.rect.x = 36 + self.placeX * 70
-                    self.rect.y = 36 + self.placeY * 70
+                    unit.dead()
+                    self.move(xmove, ymove, block)
                 if self.life == 1:
-                    dead = 1
+                    ifdead = 1
                 self.life -= unit.attack + 1
                 if self.life <= 0:
-                    if dead:
-                        self.dead()
+                    if ifdead:
                         block[self.placeX][self.placeY].ifArmyUnit = False
+                        self.dead()
                     else:
-                       self.life = 1 
+                        self.life = 1
+
 
 class Building(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
@@ -160,10 +158,10 @@ while ifGameGoing and not ifGameStarted:  # 主界面循环
 if ifGameGoing:
     pygame.mixer.music.stop()  # 停止播放音乐
     gameMap = [[Block() for i in range(10)] for j in range(10)]  # 格子类数组
-    ranTemp = numpy.random.randint(0, 4, (10, 10))
+    ranTemp = numpy.random.randint(0, 4, (10, 10))  # 随机数生成
 
     for i in range(10):
-        for j in range(10):
+        for j in range(10):  # 根据随机数生成地形
             if ranTemp[i, j] == 0:
                 gameMap[i][j].mapColor = WHITE
                 gameMap[i][j].moveCost = 1
@@ -223,7 +221,7 @@ if ifGameGoing:
                 for a in test_group:
                     a.restMoveStep = a.maxMoveStep
                 unitNum = 0
-
+            groupLength = len(test_group.sprites())
             mainScreen.fill((150, 150, 150))  # 循环的绘制部分
             textRestStep = font.render("剩余步数:" + str(nowUnit.restMoveStep), True, BLACK)
             mainScreen.blit(textRestStep, (800, 100))
@@ -236,6 +234,7 @@ if ifGameGoing:
                 textUnitHealth = font.render("生命值:" + str(nowUnit.life), True, BLACK)
             else:
                 textNow = font.render("当前单位为0!,全死了", True, BLACK)
+                textUnitHealth = font.render("生命值无" , True, BLACK)
             mainScreen.blit(textNow, (800, 300))
             mainScreen.blit(textUnitHealth, (800, 400))
             mainScreen.blit(nextTurnPic, (1200, 600))  # 下一回合按钮
