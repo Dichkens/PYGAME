@@ -45,8 +45,7 @@ class Unit(pygame.sprite.Sprite):
         self.attack = 0
         self.life = 0
         
-    def kill(self):
-        self.image.fill(BLACK)
+    def dead(self):
         self.rect.x = -100
         self.rect.y = -100
         self.placeX = -1
@@ -76,7 +75,7 @@ class Unit(pygame.sprite.Sprite):
                 self.restMoveStep = 0
                 unit.life -= self.attack
                 if unit.life <= 0:
-                    unit.kill()
+                    unit.dead()
                     block[unit.placeX][unit.placeY].ifArmyUnit = False
                     self.placeX += xmove
                     self.placeY += ymove
@@ -231,6 +230,7 @@ if ifGameGoing:
             textRound = font.render("回合数:" + str(numOfRound) + "/250", True, BLACK)
             mainScreen.blit(textRound, (800, 200))
             if groupLength != 0:
+                nowUnit = test_group.sprites()[unitNum % groupLength]
                 textNow = font.render("当前单位/总单位数:" + str(unitNum % groupLength + 1) + '/' + str(groupLength),
                                       True, BLACK)
                 textUnitHealth = font.render("生命值:" + str(nowUnit.life), True, BLACK)
