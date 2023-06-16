@@ -36,11 +36,11 @@ class Unit(pygame.sprite.Sprite):
         self.restMoveStep = step
         self.placeX = x
         self.placeY = y
-        self.image = pygame.Surface([20, 20])
+        self.image = pygame.Surface([32, 32])
         self.image.fill(image)
         self.rect = self.image.get_rect()
-        self.rect.x = 110 + self.placeX * 50
-        self.rect.y = 110 + self.placeY * 50
+        self.rect.x = 36 + self.placeX * 70
+        self.rect.y = 36 + self.placeY * 70
 
     def move(self, xmove, ymove, block):
         if 0 <= self.placeX + xmove <= 9 and 0 <= self.placeY + ymove <= 9:
@@ -51,8 +51,8 @@ class Unit(pygame.sprite.Sprite):
                     self.placeY += ymove
                     self.restMoveStep -= block[self.placeX][self.placeY].moveCost
                     block[self.placeX][self.placeY].ifArmyUnit = True
-                    self.rect.x = 110 + self.placeX * 50
-                    self.rect.y = 110 + self.placeY * 50
+                    self.rect.x = 36 + self.placeX * 70
+                    self.rect.y = 36 + self.placeY * 70
 
 
 class Building(pygame.sprite.Sprite):
@@ -79,7 +79,7 @@ def createArmyUnit(step, x, y, color, group, gamemap):
     unit = Unit(step, color, x, y)
     gamemap[x][y].ifArmyUnit = True
     group.add(unit)
-    #unit.image.blit(braverPic)
+    # unit.image.blit(braverPic)
 
 
 def createBuilding(x, y, color, group, gamemap, buildingtype):
@@ -190,11 +190,11 @@ if ifGameGoing:
 
             for i in range(10):
                 for j in range(10):
-                    mapBlockDis = pygame.Rect(100 + i * 50, 100 + j * 50, 40, 40)
+                    mapBlockDis = pygame.Rect(20 + i * 70, 20 + j * 70, 64, 64)
                     pygame.draw.rect(mainScreen, gameMap[i][j].mapColor, mapBlockDis)
+            renderNow = pygame.Rect(34 + nowUnit.placeX * 70, 34 + nowUnit.placeY * 70, 36, 36)
+            pygame.draw.rect(mainScreen, (255, 0, 255), renderNow)
             test_group.draw(mainScreen)
-            renderNow = pygame.Rect(120 + nowUnit.placeX * 50, 120 + nowUnit.placeY * 50, 10, 10)
-            pygame.draw.rect(mainScreen, WHITE, renderNow)
             pygame.display.update()
             gameClock.tick(60)
 
