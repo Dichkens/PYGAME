@@ -67,7 +67,7 @@ class Unit(pygame.sprite.Sprite):
                     block[self.placeX][self.placeY].ifArmyUnit = True
                     self.rect.x = 36 + self.placeX * 70
                     self.rect.y = 36 + self.placeY * 70
-            else:
+            elif self.restMoveStep != 0:
                 for unit in test_group.sprites():
                     if unit.placeX == self.placeX + xmove and unit.placeY == self.placeY + ymove:
                         self.restMoveStep = 0
@@ -82,9 +82,8 @@ class Unit(pygame.sprite.Sprite):
                             self.rect.y = 36 + self.placeY * 70
                             self.life = 1
                         if self.life <= 0:
-                            self.kill()
+                            self.dead()
                             block[self.placeX][self.placeY].ifArmyUnit = False
-                        
 
 class Building(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
