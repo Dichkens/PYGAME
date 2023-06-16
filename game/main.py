@@ -24,6 +24,7 @@ nextTurnPic = pygame.image.load("./image/turn.png")
 startPic = pygame.image.load("./image/start.png")
 exitPic = pygame.image.load("./image/exit.png")
 braverPic = pygame.image.load("./image/braver.png")
+swordsManPic = pygame.image.load("./image/swordsMan.png")
 
 pygame.mixer.music.load("./music/menu.mp3")  # 加载音乐
 pygame.mixer.music.play()  # 播放音乐
@@ -119,6 +120,10 @@ def createArmyUnit(step, x, y, color, group, gamemap, armytype):
         unit.image.blit(braverPic, (0, 0))
         unit.life = 10
         unit.attack = 3
+    elif armytype == "swordsMan":
+        unit.image.blit(swordsManPic, (0, 0))
+        unit.life = 20
+        unit.attack = 5
 
 
 def createBuilding(x, y, color, group, gamemap, buildingtype):
@@ -178,7 +183,7 @@ if ifGameGoing:
     test_group = pygame.sprite.Group()
     createArmyUnit(5, 5, 5, BLACK, test_group, gameMap, "braver")
     createArmyUnit(5, 4, 5, BLACK, test_group, gameMap, "braver")
-    createArmyUnit(5, 3, 5, BLACK, test_group, gameMap, "braver")
+    createArmyUnit(5, 3, 5, BLACK, test_group, gameMap, "swordsMan")
     nowUnit = test_group.sprites()[unitNum]
 
     nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
@@ -223,7 +228,7 @@ if ifGameGoing:
             mainScreen.fill((150, 150, 150))  # 循环的绘制部分
             textRestStep = font.render("剩余步数:" + str(nowUnit.restMoveStep), True, BLACK)
             mainScreen.blit(textRestStep, (800, 100))
-            textRound = font.render("回合数:" + str(numOfRound), True, BLACK)
+            textRound = font.render("回合数:" + str(numOfRound) + "/250", True, BLACK)
             mainScreen.blit(textRound, (800, 200))
             if groupLength != 0:
                 textNow = font.render("当前单位/总单位数:" + str(unitNum % groupLength + 1) + '/' + str(groupLength),
