@@ -24,7 +24,7 @@ nextTurnPic = pygame.image.load("./image/turn.png")
 startPic = pygame.image.load("./image/start.png")
 exitPic = pygame.image.load("./image/exit.png")
 
-pygame.mixer.music.load("music/menu.mp3")  # 加载音乐
+pygame.mixer.music.load("./music/menu.mp3")  # 加载音乐
 pygame.mixer.music.play()  # 播放音乐
 
 
