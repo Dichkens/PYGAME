@@ -38,6 +38,7 @@ class Unit(pygame.sprite.Sprite):
         self.placeY = y
         self.image = pygame.Surface([32, 32])
         self.image.fill(image)
+        self.image.blit(braverPic, (0, 0))
         self.rect = self.image.get_rect()
         self.rect.x = 36 + self.placeX * 70
         self.rect.y = 36 + self.placeY * 70
@@ -79,7 +80,6 @@ def createArmyUnit(step, x, y, color, group, gamemap):
     unit = Unit(step, color, x, y)
     gamemap[x][y].ifArmyUnit = True
     group.add(unit)
-    # unit.image.blit(braverPic)
 
 
 def createBuilding(x, y, color, group, gamemap, buildingtype):
