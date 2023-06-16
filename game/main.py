@@ -19,12 +19,13 @@ ifGameGoing = True
 # mainScreen.get_height() / 2
 
 
-mainBackgroundPic = pygame.image.load("./image/logo.jpg")  # 加载图片
-nextTurnPic = pygame.image.load("./image/turn.png")
-startPic = pygame.image.load("./image/start.png")
-exitPic = pygame.image.load("./image/exit.png")
-braverPic = pygame.image.load("./image/braver.png")
-swordsManPic = pygame.image.load("./image/swordsMan.png")
+mainBackgroundPic = pygame.image.load("./image/logo.jpg")  # 加载封面
+nextTurnPic = pygame.image.load("./image/turn.png")# 加载下一回合
+startPic = pygame.image.load("./image/start.png")# 加载开始按钮
+exitPic = pygame.image.load("./image/exit.png")# 加载离开按钮
+braverPic = pygame.image.load("./image/braver.png")# 加载勇士
+swordsManPic = pygame.image.load("./image/swordsMan.png")# 加载剑士
+tribePic = pygame.image.load("./image/tribe.png")# 加载部落
 
 pygame.mixer.music.load("./music/menu.mp3")  # 加载音乐
 pygame.mixer.music.play()  # 播放音乐
@@ -75,16 +76,16 @@ class Unit(pygame.sprite.Sprite):
                     self.dead()
 
 
-class Building(pygame.sprite.Sprite):
+class Building(pygame.sprite.Sprite):#建筑类
     def __init__(self, image, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.placeX = x
         self.placeY = y
-        self.image = pygame.Surface([20, 20])
+        self.image = pygame.Surface([60, 40])
         self.image.fill(image)
         self.rect = self.image.get_rect()
-        self.rect.x = 110 + self.placeX * 50
-        self.rect.y = 110 + self.placeY * 50
+        self.rect.x = 22 + self.placeX * 70
+        self.rect.y = 32 + self.placeY * 70
 
 
 class Block(object):
@@ -113,6 +114,10 @@ def createBuilding(x, y, color, group, gamemap, buildingtype):
     building = Building(color, x, y)
     gamemap[x][y].ifBuilding = True
     group.add(building)
+    if buildingtype == "tribe":
+        building.image.blit(tribePic, (0, 0))
+        building.life = 25
+        building.attack = 3
 
 
 startArea = pygame.Rect(mainScreen.get_width() / 2 - 100, mainScreen.get_height() / 2 + 50,
@@ -164,9 +169,11 @@ if ifGameGoing:
     numOfRound = 0
     unitNum = 0
     test_group = pygame.sprite.Group()
+    building_group = pygame.sprite.Group()
     createArmyUnit(5, 5, 5, BLACK, test_group, gameMap, "braver")
     createArmyUnit(5, 4, 5, BLACK, test_group, gameMap, "braver")
     createArmyUnit(5, 3, 5, BLACK, test_group, gameMap, "swordsMan")
+    createBuilding(5, 7, BLACK, building_group, gameMap, "tribe")
     nowUnit = test_group.sprites()[unitNum]
 
     nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
@@ -205,7 +212,8 @@ if ifGameGoing:
                 numOfRound += 1
                 ifRoundEnd = False
                 for a in test_group:
-                    a.restMoveStep = a.maxMoveStep
+                    if a is nowUnit:
+                        a.restMoveStep = a.maxMoveStep
                 unitNum = 0
             groupLength = len(test_group.sprites())
             mainScreen.fill((150, 150, 150))  # 循环的绘制部分
@@ -231,6 +239,7 @@ if ifGameGoing:
                     pygame.draw.rect(mainScreen, gameMap[i][j].mapColor, mapBlockDis)
             renderNow = pygame.Rect(34 + nowUnit.placeX * 70, 34 + nowUnit.placeY * 70, 36, 36)
             pygame.draw.rect(mainScreen, (255, 0, 255), renderNow)
+            building_group.draw(mainScreen)
             test_group.draw(mainScreen)
             pygame.display.update()
             gameClock.tick(60)
