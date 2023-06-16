@@ -79,7 +79,7 @@ def createArmyUnit(step, x, y, color, group, gamemap):
     unit = Unit(step, color, x, y)
     gamemap[x][y].ifArmyUnit = True
     group.add(unit)
-    unit.image.blit(braverPic)
+    #unit.image.blit(braverPic)
 
 
 def createBuilding(x, y, color, group, gamemap, buildingtype):
