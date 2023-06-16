@@ -23,6 +23,7 @@ mainBackgroundPic = pygame.image.load("./image/logo.jpg")  # 加载图片
 nextTurnPic = pygame.image.load("./image/turn.png")
 startPic = pygame.image.load("./image/start.png")
 exitPic = pygame.image.load("./image/exit.png")
+braverPic = pygame.image.load("./image/braver.png")
 
 pygame.mixer.music.load("./music/menu.mp3")  # 加载音乐
 pygame.mixer.music.play()  # 播放音乐
@@ -78,6 +79,7 @@ def createArmyUnit(step, x, y, color, group, gamemap):
     unit = Unit(step, color, x, y)
     gamemap[x][y].ifArmyUnit = True
     group.add(unit)
+    unit.image.blit(braverPic)
 
 
 def createBuilding(x, y, color, group, gamemap, buildingtype):
