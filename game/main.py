@@ -121,7 +121,6 @@ if ifGameGoing:
 
     for i in range(10):
         for j in range(10):
-            mapBlockDis = pygame.Rect(100 + i * 50, 100 + j * 50, 40, 40)
             if ranTemp[i, j] == 0:
                 gameMap[i][j].mapColor = WHITE
                 gameMap[i][j].moveCost = 1
@@ -134,8 +133,6 @@ if ifGameGoing:
             elif ranTemp[i, j] == 3:
                 gameMap[i][j].mapColor = RED
                 gameMap[i][j].moveCost = 4
-            pygame.draw.rect(mainScreen, gameMap[i][j].mapColor, mapBlockDis)
-    pygame.display.update()
     ifRoundEnd = False
     numOfRound = 0
     unitNum = 0
