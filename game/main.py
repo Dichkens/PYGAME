@@ -38,10 +38,23 @@ class Unit(pygame.sprite.Sprite):
         self.placeY = y
         self.image = pygame.Surface([32, 32])
         self.image.fill(image)
-        self.image.blit(braverPic, (0, 0))
         self.rect = self.image.get_rect()
         self.rect.x = 36 + self.placeX * 70
         self.rect.y = 36 + self.placeY * 70
+        self.attack = 0
+        self.life = 0
+        
+    def kill(self):
+        self.image.fill(BLACK)
+        self.rect.x = -100
+        self.rect.y = -100
+        self.placeX = -1
+        self.placeY = -1
+        self.restMoveStep = 0
+        self.maxMoveStep = 0
+        self.attack = 0
+        self.life = 0
+        self.remove(test_group)
 
     def move(self, xmove, ymove, block):
         if 0 <= self.placeX + xmove <= 9 and 0 <= self.placeY + ymove <= 9:
@@ -54,7 +67,24 @@ class Unit(pygame.sprite.Sprite):
                     block[self.placeX][self.placeY].ifArmyUnit = True
                     self.rect.x = 36 + self.placeX * 70
                     self.rect.y = 36 + self.placeY * 70
-
+            else:
+                for unit in test_group.sprites():
+                    if unit.placeX == self.placeX + xmove and unit.placeY == self.placeY + ymove:
+                        self.restMoveStep = 0
+                        unit.life -= self.attack
+                        self.life -= unit.attack + 1
+                        if unit.life <= 0:
+                            unit.kill()
+                            block[unit.placeX][unit.placeY].ifArmyUnit = False
+                            self.placeX += xmove
+                            self.placeY += ymove
+                            self.rect.x = 36 + self.placeX * 70
+                            self.rect.y = 36 + self.placeY * 70
+                            self.life = 1
+                        if self.life <= 0:
+                            self.kill()
+                            block[self.placeX][self.placeY].ifArmyUnit = False
+                        
 
 class Building(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
@@ -76,10 +106,14 @@ class Block(object):
         self.ifBuilding = False
 
 
-def createArmyUnit(step, x, y, color, group, gamemap):
+def createArmyUnit(step, x, y, color, group, gamemap, armytype):
     unit = Unit(step, color, x, y)
     gamemap[x][y].ifArmyUnit = True
     group.add(unit)
+    if armytype == "braver":
+        unit.image.blit(braverPic, (0, 0))
+        unit.life = 10
+        unit.attack = 3
 
 
 def createBuilding(x, y, color, group, gamemap, buildingtype):
@@ -137,8 +171,8 @@ if ifGameGoing:
     numOfRound = 0
     unitNum = 0
     test_group = pygame.sprite.Group()
-    createArmyUnit(5, 5, 5, BLACK, test_group, gameMap)
-    createArmyUnit(5, 4, 5, BLACK, test_group, gameMap)
+    createArmyUnit(5, 5, 5, BLACK, test_group, gameMap, "braver")
+    createArmyUnit(5, 4, 5, BLACK, test_group, gameMap, "braver")
     nowUnit = test_group.sprites()[unitNum]
 
     nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
@@ -183,8 +217,11 @@ if ifGameGoing:
             mainScreen.blit(textRestStep, (800, 100))
             textRound = font.render("回合数:" + str(numOfRound), True, BLACK)
             mainScreen.blit(textRound, (800, 200))
-            textNow = font.render("当前单位/总单位数:" + str(unitNum % groupLength + 1) + '/' + str(groupLength), True,
-                                  BLACK)
+            if groupLength != 0:
+                textNow = font.render("当前单位/总单位数:" + str(unitNum % groupLength + 1) + '/' + str(groupLength), True,
+                                    BLACK)
+            else:
+                textNow = font.render("当前单位为0!,全死了" , True, BLACK)
             mainScreen.blit(textNow, (800, 300))
             mainScreen.blit(nextTurnPic, (1200, 600))  # 下一回合按钮
 
