@@ -178,6 +178,7 @@ if ifGameGoing:
     test_group = pygame.sprite.Group()
     createArmyUnit(5, 5, 5, BLACK, test_group, gameMap, "braver")
     createArmyUnit(5, 4, 5, BLACK, test_group, gameMap, "braver")
+    createArmyUnit(5, 3, 5, BLACK, test_group, gameMap, "braver")
     nowUnit = test_group.sprites()[unitNum]
 
     nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
