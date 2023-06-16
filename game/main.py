@@ -207,6 +207,8 @@ if ifGameGoing:
                 elif event.key == pygame.K_k:
                     unitNum += 1
                     nowUnit = test_group.sprites()[unitNum % groupLength]
+                elif event.key == pygame.K_a:
+                    createArmyUnit(5, 3, 3, BLACK, test_group, gameMap, "braver")
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 点击下一回合
                 mousePos = pygame.mouse.get_pos()
                 if nextTurnArea.collidepoint(mousePos):
