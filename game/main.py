@@ -43,7 +43,7 @@ class Unit(pygame.sprite.Sprite):
         self.rect.y = 36 + self.placeY * 70
         self.attack = 0
         self.life = 0
-
+        
     def kill(self):
         self.image.fill(BLACK)
         self.rect.x = -100
@@ -70,21 +70,26 @@ class Unit(pygame.sprite.Sprite):
             elif self.restMoveStep != 0:
                 for unit in test_group.sprites():
                     if unit.placeX == self.placeX + xmove and unit.placeY == self.placeY + ymove:
-                        self.restMoveStep = 0
-                        unit.life -= self.attack
-                        self.life -= unit.attack + 1
-                        if unit.life <= 0:
-                            unit.kill()
-                            block[unit.placeX][unit.placeY].ifArmyUnit = False
-                            self.placeX += xmove
-                            self.placeY += ymove
-                            self.rect.x = 36 + self.placeX * 70
-                            self.rect.y = 36 + self.placeY * 70
-                            self.life = 1
-                        if self.life <= 0:
-                            self.dead()
-                            block[self.placeX][self.placeY].ifArmyUnit = False
-
+                        break
+                dead = 0
+                self.restMoveStep = 0
+                unit.life -= self.attack
+                if unit.life <= 0:
+                    unit.kill()
+                    block[unit.placeX][unit.placeY].ifArmyUnit = False
+                    self.placeX += xmove
+                    self.placeY += ymove
+                    self.rect.x = 36 + self.placeX * 70
+                    self.rect.y = 36 + self.placeY * 70
+                if self.life == 1:
+                    dead = 1
+                self.life -= unit.attack + 1
+                if self.life <= 0:
+                    if dead:
+                        self.dead()
+                        block[self.placeX][self.placeY].ifArmyUnit = False
+                    else:
+                       self.life = 1 
 
 class Building(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
