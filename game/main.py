@@ -43,7 +43,7 @@ class Unit(pygame.sprite.Sprite):
         self.rect.y = 36 + self.placeY * 70
         self.attack = 0
         self.life = 0
-        
+
     def kill(self):
         self.image.fill(BLACK)
         self.rect.x = -100
@@ -84,6 +84,7 @@ class Unit(pygame.sprite.Sprite):
                         if self.life <= 0:
                             self.dead()
                             block[self.placeX][self.placeY].ifArmyUnit = False
+
 
 class Building(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
@@ -217,11 +218,13 @@ if ifGameGoing:
             textRound = font.render("回合数:" + str(numOfRound), True, BLACK)
             mainScreen.blit(textRound, (800, 200))
             if groupLength != 0:
-                textNow = font.render("当前单位/总单位数:" + str(unitNum % groupLength + 1) + '/' + str(groupLength), True,
-                                    BLACK)
+                textNow = font.render("当前单位/总单位数:" + str(unitNum % groupLength + 1) + '/' + str(groupLength),
+                                      True, BLACK)
+                textUnitHealth = font.render("生命值:" + str(nowUnit.life), True, BLACK)
             else:
-                textNow = font.render("当前单位为0!,全死了" , True, BLACK)
+                textNow = font.render("当前单位为0!,全死了", True, BLACK)
             mainScreen.blit(textNow, (800, 300))
+            mainScreen.blit(textUnitHealth, (800, 400))
             mainScreen.blit(nextTurnPic, (1200, 600))  # 下一回合按钮
 
             for i in range(10):
