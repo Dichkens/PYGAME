@@ -1,5 +1,6 @@
 import pygame
 import numpy
+import random
 
 pygame.init()  # 初始化pygame
 
@@ -26,7 +27,10 @@ exitPic = pygame.image.load("./image/exit.png")# 加载离开按钮
 braverPic = pygame.image.load("./image/braver.png")# 加载勇士
 swordsManPic = pygame.image.load("./image/swordsMan.png")# 加载剑士
 tribePic = pygame.image.load("./image/tribe.png")# 加载部落
+musicPausePic = pygame.image.load("./image/musicPause.png")# 加载暂停音乐按钮
+musicSkipPic = pygame.image.load("./image/musicSkip.png")# 加载跳过音乐按钮
 
+musicList = ['China', 'BGM1', 'BGM2', 'BGM3', 'BGM4', 'BGM5', 'BGM6', 'Russia' ]
 pygame.mixer.music.load("./music/menu.mp3")  # 加载音乐
 pygame.mixer.music.play()  # 播放音乐
 
@@ -96,7 +100,7 @@ class Block(object):
         self.ifBuilding = False
 
 
-def createArmyUnit(step, x, y, color, group, gamemap, armytype):
+def createArmyUnit(step, x, y, color, group, gamemap, armytype):#创建军队单位
     unit = Unit(step, color, x, y)
     gamemap[x][y].ifArmyUnit = True
     group.add(unit)
@@ -110,7 +114,7 @@ def createArmyUnit(step, x, y, color, group, gamemap, armytype):
         unit.attack = 5
 
 
-def createBuilding(x, y, color, group, gamemap, buildingtype):
+def createBuilding(x, y, color, group, gamemap, buildingtype):#创建城市
     building = Building(color, x, y)
     gamemap[x][y].ifBuilding = True
     group.add(building)
@@ -122,14 +126,14 @@ def createBuilding(x, y, color, group, gamemap, buildingtype):
 
 startArea = pygame.Rect(mainScreen.get_width() / 2 - 100, mainScreen.get_height() / 2 + 50,
                         mainScreen.get_width() / 2 + 100, mainScreen.get_height() / 2 + 50)  # 下一回合点击区域
-exitArea = pygame.Rect(mainScreen.get_width() / 2 - 100, mainScreen.get_height() / 2 + 100,
-                       mainScreen.get_width() / 2 + 100, mainScreen.get_height() / 2 + 100)  # 下一回合点击区域
+exitArea = pygame.Rect(mainScreen.get_width() / 2 - 100, mainScreen.get_height() / 2 + 150,
+                       mainScreen.get_width() / 2 + 100, mainScreen.get_height() / 2 + 150)  # 下一回合点击区域
 
 ifGameStarted = False
-font = pygame.font.SysFont('华文隶书', 40)
-mainScreen.blit(mainBackgroundPic, (0, 0))
-mainScreen.blit(startPic, startArea)
-mainScreen.blit(exitPic, exitArea)
+font = pygame.font.SysFont('华文隶书', 40) # 字体
+mainScreen.blit(mainBackgroundPic, (0, 0)) # 封面
+mainScreen.blit(startPic, startArea) # 开始按钮
+mainScreen.blit(exitPic, exitArea) # 离开按钮
 pygame.display.flip()
 
 while ifGameGoing and not ifGameStarted:  # 主界面循环
@@ -147,7 +151,8 @@ while ifGameGoing and not ifGameStarted:  # 主界面循环
                 ifGameGoing = False
     pygame.display.update()
 if ifGameGoing:
-    pygame.mixer.music.stop()  # 停止播放音乐
+    pygame.mixer.music.load("./music/China.mp3")  # 加载游戏内音乐
+    pygame.mixer.music.play()  # 播放音乐
     gameMap = [[Block() for i in range(10)] for j in range(10)]  # 格子类数组
     ranTemp = numpy.random.randint(0, 4, (10, 10))  # 随机数生成
 
@@ -177,6 +182,9 @@ if ifGameGoing:
     nowUnit = test_group.sprites()[unitNum]
 
     nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
+    musicPauseArea = pygame.Rect((1205, 0), (1280, 75))  # 音乐暂停点击区域
+    musicSkipArea = pygame.Rect((1130, 0), (1205, 75))  # 音乐跳过点击区域
+    ifMusicPause = False
 
     while ifGameGoing:  # 游戏开始循环
         for event in pygame.event.get():
@@ -208,6 +216,16 @@ if ifGameGoing:
                 mousePos = pygame.mouse.get_pos()
                 if nextTurnArea.collidepoint(mousePos):
                     ifRoundEnd = True
+                if musicPauseArea.collidepoint(mousePos):#音乐暂停
+                    ifMusicPause = not ifMusicPause
+                    if ifMusicPause:
+                        pygame.mixer.music.pause()
+                    else:
+                        pygame.mixer.music.unpause()
+                if musicSkipArea.collidepoint(mousePos):#下一首音乐
+                    next = random.choice(musicList)
+                    pygame.mixer.music.load(r"./music/%s.mp3" % next)
+                    pygame.mixer.music.play()
             if ifRoundEnd:
                 numOfRound += 1
                 ifRoundEnd = False
@@ -232,6 +250,8 @@ if ifGameGoing:
             mainScreen.blit(textNow, (800, 300))
             mainScreen.blit(textUnitHealth, (800, 400))
             mainScreen.blit(nextTurnPic, (1200, 600))  # 下一回合按钮
+            mainScreen.blit(musicPausePic, (1205, 0))  # 音乐暂停按钮
+            mainScreen.blit(musicSkipPic, (1130, 0))  # 音乐跳过按钮
 
             for i in range(10):
                 for j in range(10):
