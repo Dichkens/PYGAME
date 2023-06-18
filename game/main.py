@@ -1,7 +1,9 @@
+import os
+import sys
 import pygame
 import numpy
 import random
-
+os.chdir(os.path.dirname(sys.argv[0]))
 pygame.init()  # 初始化pygame
 
 RED = (255, 0, 0)  # 红色，使用RGB颜色
