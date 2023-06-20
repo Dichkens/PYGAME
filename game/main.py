@@ -16,7 +16,7 @@ gameClock = pygame.time.Clock()  # test
 windowSize = (1280, 720)
 mainScreen = pygame.display.set_mode(windowSize)  # Pygame窗口
 pygame.display.set_caption("文明6_低配版")  # 标题
-ifGameGoing = True
+
 
 # mainScreen.get_width() / 2
 # mainScreen.get_height() / 2
@@ -26,6 +26,8 @@ mainBackgroundPic = pygame.image.load("./image/logo.jpg")  # 加载封面
 nextTurnPic = pygame.image.load("./image/turn.png")# 加载下一回合
 startPic = pygame.image.load("./image/start.png")# 加载开始按钮
 exitPic = pygame.image.load("./image/exit.png")# 加载离开按钮
+GoingtoStartPic = pygame.image.load("./image/GoingtoStart.png")# 加载GoingtoStartPic
+GoingtoExitPic = pygame.image.load("./image/GoingtoExit.png")# 加载GoingtoExitPic
 braverPic = pygame.image.load("./image/braver.png")# 加载勇士
 swordsManPic = pygame.image.load("./image/swordsMan.png")# 加载剑士
 tribePic = pygame.image.load("./image/tribe.png")# 加载部落
@@ -125,18 +127,19 @@ def createBuilding(x, y, color, group, gamemap, buildingtype):#创建城市
         building.life = 25
         building.attack = 3
 
+startArea1 = (mainScreen.get_width() / 2 - 140, mainScreen.get_height() / 2 + 50)
+startArea2 = (280,50)
+exitArea1 = (mainScreen.get_width() / 2 - 140, mainScreen.get_height() / 2 + 100)
+exitArea2 = (280,50)
 
-startArea = pygame.Rect(mainScreen.get_width() / 2 - 100, mainScreen.get_height() / 2 + 50,
-                        mainScreen.get_width() / 2 + 100, mainScreen.get_height() / 2 + 50)  # 下一回合点击区域
-exitArea = pygame.Rect(mainScreen.get_width() / 2 - 100, mainScreen.get_height() / 2 + 150,
-                       mainScreen.get_width() / 2 + 100, mainScreen.get_height() / 2 + 150)  # 下一回合点击区域
-
+startArea = pygame.Rect(startArea1, startArea2)  # 下一回合点击区域
+exitArea = pygame.Rect(exitArea1, exitArea2)  # 下一回合点击区域
 ifGameStarted = False
+ifGameGoing = True
+ifGoingtoStart = False
+ifGoingtoExit = False
 font = pygame.font.SysFont('华文隶书', 40) # 字体
-mainScreen.blit(mainBackgroundPic, (0, 0)) # 封面
-mainScreen.blit(startPic, startArea) # 开始按钮
-mainScreen.blit(exitPic, exitArea) # 离开按钮
-pygame.display.flip()
+
 
 while ifGameGoing and not ifGameStarted:  # 主界面循环
     for event in pygame.event.get():  # 遍历事件
@@ -147,10 +150,28 @@ while ifGameGoing and not ifGameStarted:  # 主界面循环
                 ifGameGoing = False
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 点击开始
             mousePos = pygame.mouse.get_pos()
+            print(mousePos)                           # 打印鼠标位置
             if startArea.collidepoint(mousePos):
                 ifGameStarted = True
             if exitArea.collidepoint(mousePos):
                 ifGameGoing = False
+        if event.type == pygame.MOUSEMOTION:
+            mousePos = pygame.mouse.get_pos()
+            if startArea.collidepoint(mousePos):
+                ifGoingtoStart = True
+            else:
+                ifGoingtoStart = False
+            if exitArea.collidepoint(mousePos):
+                ifGoingtoExit = True
+            else:
+                ifGoingtoExit = False
+    mainScreen.blit(mainBackgroundPic, (0, 0)) # 封面
+    mainScreen.blit(startPic, startArea1) # 开始按钮
+    mainScreen.blit(exitPic, exitArea1) # 离开按钮
+    if ifGoingtoStart:
+        mainScreen.blit(GoingtoStartPic, startArea)
+    if ifGoingtoExit:
+        mainScreen.blit(GoingtoExitPic, exitArea)
     pygame.display.update()
 if ifGameGoing:
     pygame.mixer.music.load("./music/China.mp3")  # 加载游戏内音乐
@@ -216,6 +237,7 @@ if ifGameGoing:
                     createArmyUnit(5, 3, 3, BLACK, test_group, gameMap, "braver")
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 点击下一回合
                 mousePos = pygame.mouse.get_pos()
+                print(mousePos)                    # 打印鼠标位置
                 if nextTurnArea.collidepoint(mousePos):
                     ifRoundEnd = True
                 if musicPauseArea.collidepoint(mousePos):#音乐暂停
