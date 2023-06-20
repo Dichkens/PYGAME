@@ -205,8 +205,8 @@ if ifGameGoing:
     nowUnit = test_group.sprites()[unitNum]
 
     nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
-    musicPauseArea = pygame.Rect((1205, 0), (1280, 75))  # 音乐暂停点击区域
-    musicSkipArea = pygame.Rect((1130, 0), (1205, 75))  # 音乐跳过点击区域
+    musicPauseArea = pygame.Rect((1205, 0), (75, 75))  # 音乐暂停点击区域
+    musicSkipArea = pygame.Rect((1130, 0), (75, 75))  # 音乐跳过点击区域
     ifMusicPause = False
 
     while ifGameGoing:  # 游戏开始循环
