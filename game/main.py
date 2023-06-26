@@ -322,7 +322,11 @@ if ifGameGoing:
                     if b.produce is not None:
                         b.restRound = b.restRound - 1
                         if b.restRound == 0:
-                            if b.produce == "braver":
+                            if b.production == "settler":
+                                createArmyUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "braver")
+                            elif b.produce == "swordsMan":
+                                createArmyUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "swordsMan")
+                            elif b.produce == "braver":
                                 createArmyUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "braver")
                 unitNum = 0
             groupLength = len(unit_group.sprites())
