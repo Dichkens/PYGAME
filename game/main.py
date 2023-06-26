@@ -3,6 +3,7 @@ import sys
 import pygame
 import numpy
 import random
+
 os.chdir(os.path.dirname(sys.argv[0]))
 pygame.init()  # 初始化pygame
 
@@ -17,37 +18,36 @@ windowSize = (1280, 720)
 mainScreen = pygame.display.set_mode(windowSize)  # Pygame窗口
 pygame.display.set_caption("文明6_低配版")  # 标题
 
-
 # mainScreen.get_width() / 2
 # mainScreen.get_height() / 2
 
-##图片
+# 图片
 mainBackgroundPic = pygame.image.load("./image/logo.jpg")  # 加载封面
-nextTurnPic = pygame.image.load("./image/turn.png")# 加载下一回合
-startPic = pygame.image.load("./image/start.png")# 加载开始按钮
-exitPic = pygame.image.load("./image/exit.png")# 加载离开按钮
-GoingtoStartPic = pygame.image.load("./image/GoingtoStart.png")# 加载GoingtoStartPic
-GoingtoExitPic = pygame.image.load("./image/GoingtoExit.png")# 加载GoingtoExitPic
-braverPic = pygame.image.load("./image/braver1.png")# 加载勇士
-swordsManPic = pygame.image.load("./image/swordsMan1.png")# 加载剑士
-tribePic = pygame.image.load("./image/tribe.png")# 加载部落
-musicPausePic = pygame.image.load("./image/musicPause.png")# 加载暂停音乐按钮
-musicSkipPic = pygame.image.load("./image/musicSkip.png")# 加载跳过音乐按钮
-settlerInBuildingPic = pygame.image.load("./image/settlerInBuilding.png")# 加载建造中的移民
-settlerPic = pygame.image.load("./image/settler.png")# 加载移民
+nextTurnPic = pygame.image.load("./image/turn.png")  # 加载下一回合
+startPic = pygame.image.load("./image/start.png")  # 加载开始按钮
+exitPic = pygame.image.load("./image/exit.png")  # 加载离开按钮
+GoingtoStartPic = pygame.image.load("./image/GoingtoStart.png")  # 加载GoingtoStartPic
+GoingtoExitPic = pygame.image.load("./image/GoingtoExit.png")  # 加载GoingtoExitPic
+braverPic = pygame.image.load("./image/braver1.png")  # 加载勇士
+swordsManPic = pygame.image.load("./image/swordsMan1.png")  # 加载剑士
+tribePic = pygame.image.load("./image/tribe.png")  # 加载部落
+musicPausePic = pygame.image.load("./image/musicPause.png")  # 加载暂停音乐按钮
+musicSkipPic = pygame.image.load("./image/musicSkip.png")  # 加载跳过音乐按钮
+settlerInBuildingPic = pygame.image.load("./image/settlerInBuilding.png")  # 加载建造中的移民
+settlerPic = pygame.image.load("./image/settler.png")  # 加载移民
 
-##音乐
-musicList = ['China', 'BGM1', 'BGM2', 'BGM3', 'BGM4', 'BGM5', 'BGM6', 'Russia' ]
+# 音乐
+musicList = ['China', 'BGM1', 'BGM2', 'BGM3', 'BGM4', 'BGM5', 'BGM6', 'Russia']
 pygame.mixer.music.load("./music/menu.mp3")  # 加载音乐
 pygame.mixer.music.play()  # 播放音乐
 
-##点 or 坐标
+# 点 or 坐标
 startArea1 = (mainScreen.get_width() / 2 - 140, mainScreen.get_height() / 2 + 50)
-startArea2 = (280,50)
+startArea2 = (280, 50)
 exitArea1 = (mainScreen.get_width() / 2 - 140, mainScreen.get_height() / 2 + 100)
-exitArea2 = (280,50)
+exitArea2 = (280, 50)
 
-##区域
+# 区域
 startArea = pygame.Rect(startArea1, startArea2)  # 下一回合点击区域
 exitArea = pygame.Rect(exitArea1, exitArea2)  # 下一回合点击区域
 nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
@@ -55,7 +55,7 @@ musicPauseArea = pygame.Rect((1205, 0), (75, 75))  # 音乐暂停点击区域
 musicSkipArea = pygame.Rect((1130, 0), (75, 75))  # 音乐跳过点击区域
 settlerInBuildingArea = pygame.Rect((40, 60), (280, 300))  # 建造中的移民点击区域
 
-##tag
+# tag
 ifGameStarted = False
 ifGameGoing = True
 ifGoingtoStart = False
@@ -64,7 +64,8 @@ ifMusicPause = False
 ifRoundEnd = False
 ifBuildingWindow = False
 
-font = pygame.font.SysFont('华文隶书', 40) # 字体
+font = pygame.font.SysFont('华文隶书', 40)  # 字体
+
 
 class Unit(pygame.sprite.Sprite):
     def __init__(self, step, image, x, y):
@@ -111,7 +112,7 @@ class Unit(pygame.sprite.Sprite):
                     self.dead()
 
 
-class Building(pygame.sprite.Sprite):#建筑类
+class Building(pygame.sprite.Sprite):  # 建筑类
     def __init__(self, image, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.placeX = x
@@ -131,7 +132,7 @@ class Block(object):
         self.ifBuilding = False
 
 
-def createArmyUnit(step, x, y, color, group, gamemap, armytype):#创建军队单位
+def createArmyUnit(step, x, y, color, group, gamemap, armytype):  # 创建军队单位
     unit = Unit(step, color, x, y)
     gamemap[x][y].ifArmyUnit = True
     group.add(unit)
@@ -145,7 +146,7 @@ def createArmyUnit(step, x, y, color, group, gamemap, armytype):#创建军队单
         unit.attack = 5
 
 
-def createBuilding(x, y, color, group, gamemap, buildingtype):#创建城市
+def createBuilding(x, y, color, group, gamemap, buildingtype):  # 创建城市
     building = Building(color, x, y)
     gamemap[x][y].ifBuilding = True
     group.add(building)
@@ -156,24 +157,24 @@ def createBuilding(x, y, color, group, gamemap, buildingtype):#创建城市
         building.attack = 3
 
 
-
-def buildingWindow(building):#建筑窗口
+def buildingWindow(building):  # 建筑窗口
+    global ifBuildingWindow
+    global ifGameGoing
     ifSwordsMan = False
     ifBuildingWindow = True
     while ifBuildingWindow:
-        for event in pygame.event.get():
-            mousePos = pygame.mouse.get_pos()
-            if event.type == pygame.QUIT:
+        for event_b in pygame.event.get():
+            mousePosBuild = pygame.mouse.get_pos()
+            if event_b.type == pygame.QUIT:
                 ifGameGoing = False
-                ifBuildingWindow = False  
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if settlerInBuildingArea.collidepoint(mousePos):
-                    
-                    ifBuildingWindow = False 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                ifBuildingWindow = False
+            if event_b.type == pygame.MOUSEBUTTONDOWN and event_b.button == 1:
+                if settlerInBuildingArea.collidepoint(mousePosBuild):
                     ifBuildingWindow = False
-            
+            if event_b.type == pygame.KEYDOWN:
+                if event_b.key == pygame.K_ESCAPE:
+                    ifBuildingWindow = False
+
         if building.type == "county":
             ifSwordsMan = True
         mainScreen.fill(WHITE)
@@ -184,6 +185,7 @@ def buildingWindow(building):#建筑窗口
         mainScreen.blit(textRestStep, (800, 100))
         pygame.display.update()
 
+
 while ifGameGoing and not ifGameStarted:  # 主界面循环
     for event in pygame.event.get():  # 遍历事件
         if event.type == pygame.QUIT:  # 退出事件
@@ -193,7 +195,7 @@ while ifGameGoing and not ifGameStarted:  # 主界面循环
                 ifGameGoing = False
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 点击开始
             mousePos = pygame.mouse.get_pos()
-            print(mousePos)                           # 打印鼠标位置
+            print(mousePos)  # 打印鼠标位置
             if startArea.collidepoint(mousePos):
                 ifGameStarted = True
             if exitArea.collidepoint(mousePos):
@@ -208,9 +210,9 @@ while ifGameGoing and not ifGameStarted:  # 主界面循环
                 ifGoingtoExit = True
             else:
                 ifGoingtoExit = False
-    mainScreen.blit(mainBackgroundPic, (0, 0)) # 封面
-    mainScreen.blit(startPic, startArea1) # 开始按钮
-    mainScreen.blit(exitPic, exitArea1) # 离开按钮
+    mainScreen.blit(mainBackgroundPic, (0, 0))  # 封面
+    mainScreen.blit(startPic, startArea1)  # 开始按钮
+    mainScreen.blit(exitPic, exitArea1)  # 离开按钮
     if ifGoingtoStart:
         mainScreen.blit(GoingtoStartPic, startArea)
     if ifGoingtoExit:
@@ -274,23 +276,23 @@ if ifGameGoing:
                 elif event.key == pygame.K_a:
                     createArmyUnit(5, 3, 3, BLACK, unit_group, gameMap, "braver")
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 点击下一回合
-                print(mousePos)                    # 打印鼠标位置
+                print(mousePos)  # 打印鼠标位置
                 if nextTurnArea.collidepoint(mousePos):
                     ifRoundEnd = True
-                elif musicPauseArea.collidepoint(mousePos):#音乐暂停
+                elif musicPauseArea.collidepoint(mousePos):  # 音乐暂停
                     ifMusicPause = not ifMusicPause
                     if ifMusicPause:
                         pygame.mixer.music.pause()
                     else:
                         pygame.mixer.music.unpause()
-                elif musicSkipArea.collidepoint(mousePos):#下一首音乐
-                    next = random.choice(musicList)
-                    pygame.mixer.music.load(r"./music/%s.mp3" % next)
+                elif musicSkipArea.collidepoint(mousePos):  # 下一首音乐
+                    nextMusic = random.choice(musicList)
+                    pygame.mixer.music.load(r"./music/%s.mp3" % nextMusic)
                     pygame.mixer.music.play()
                 else:
-                    for unit in building_group.sprites():
-                        if unit.rect.collidepoint(mousePos):
-                            buildingWindow(unit)
+                    for unit_now in building_group.sprites():
+                        if unit_now.rect.collidepoint(mousePos):
+                            buildingWindow(unit_now)
                             break
             if ifRoundEnd:
                 numOfRound += 1
@@ -312,7 +314,7 @@ if ifGameGoing:
                 textUnitHealth = font.render("生命值:" + str(nowUnit.life), True, BLACK)
             else:
                 textNow = font.render("当前单位为0!,全死了", True, BLACK)
-                textUnitHealth = font.render("生命值无" , True, BLACK)
+                textUnitHealth = font.render("生命值无", True, BLACK)
             mainScreen.blit(textNow, (800, 300))
             mainScreen.blit(textUnitHealth, (800, 400))
             mainScreen.blit(nextTurnPic, (1200, 640, 80, 80))  # 下一回合按钮
