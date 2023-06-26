@@ -32,6 +32,7 @@ settlerPic = pygame.image.load("./image/settler.png")  # 加载移民
 braverPic = pygame.image.load("./image/braver1.png")  # 加载勇士
 swordsManPic = pygame.image.load("./image/swordsMan1.png")  # 加载剑士
 tribePic = pygame.image.load("./image/tribe1.png")  # 加载部落
+countryPic = pygame.image.load("./image/country.png")
 musicPausePic = pygame.image.load("./image/musicPause.png")  # 加载暂停音乐按钮
 musicSkipPic = pygame.image.load("./image/musicSkip.png")  # 加载跳过音乐按钮
 settlerInBuildingPic = pygame.image.load("./image/settlerInBuilding.png")  # 加载建造中的移民
@@ -122,7 +123,7 @@ class Unit(pygame.sprite.Sprite):
 
 
 class Building(pygame.sprite.Sprite):  # 建筑类
-    def __init__(self, image, x, y):
+    def __init__(self, image, x, y, build_type):
         pygame.sprite.Sprite.__init__(self)
         self.placeX = x
         self.placeY = y
@@ -133,6 +134,9 @@ class Building(pygame.sprite.Sprite):  # 建筑类
         self.rect.y = 20 + self.placeY * 70
         self.produce = None
         self.restRound = None
+        self.type = build_type
+        self.stage = "tribe"
+        self.stageRound = 10
 
 
 class Block(object):
@@ -156,20 +160,21 @@ def createArmyUnit(step, x, y, color, group, gamemap, armytype):  # 创建军队
         unit.life = 20
         unit.attack = 5
 
-def createCivilUnit(step, x, y, color, group, gamemap, civiltype):  # 创建平民单位
+
+def createCivilUnit(step, x, y, color, group, gamemap, civilType):  # 创建平民单位
     unit = Unit(step, color, x, y)
     group.add(unit)
-    if civiltype == "settler":
+    if civilType == "settler":
         unit.image.blit(settlerPic, (0, 0))
         unit.life = 1
         unit.attack = 0
 
+
 def createBuilding(x, y, color, group, gamemap, buildingtype):  # 创建城市
-    building = Building(color, x, y)
+    building = Building(color, x, y, buildingtype)
     gamemap[x][y].ifBuilding = True
     group.add(building)
     if buildingtype == "tribe":
-        building.type = "tribe"
         building.image.blit(tribePic, (0, 0))
         building.life = 25
         building.attack = 3
@@ -189,9 +194,13 @@ def buildingWindow(building):  # 建筑窗口
             if event_b.type == pygame.MOUSEBUTTONDOWN and event_b.button == 1:
                 if settlerInBuildingArea.collidepoint(mousePosBuild):
                     if building.produce is None:
+                        building.produce = "settler"
+                        building.restRound = 5
+                elif braverInBuildingArea.collidepoint(mousePosBuild):
+                    if building.produce is None:
                         building.produce = "braver"
                         building.restRound = 3
-                if nextTurnArea.collidepoint(mousePosBuild):
+                elif nextTurnArea.collidepoint(mousePosBuild):
                     ifBuildingWindow = False
             if event_b.type == pygame.KEYDOWN:
                 if event_b.key == pygame.K_ESCAPE:
@@ -211,9 +220,11 @@ def buildingWindow(building):  # 建筑窗口
         mainScreen.blit(buildingText, (800, 100))
         textRestLife = font.render(f"剩余生命值:{building.life}", True, BLACK)
         textBuildingtype = font.render(f"建筑类型:{building.type}", True, BLACK)
+        textBuildingUpdate = font.render(f"距离建筑升级:{building.stageRound}", True, BLACK)
         mainScreen.blit(textRestLife, (800, 200))
         mainScreen.blit(textBuildingtype, (800, 300))
         mainScreen.blit(backPic, (1200, 640))
+        mainScreen.blit(textBuildingUpdate, (800, 400))
         pygame.display.update()
 
 
@@ -335,12 +346,19 @@ if ifGameGoing:
                     if b.produce is not None:
                         b.restRound = b.restRound - 1
                         if b.restRound == 0:
-                            if b.production == "settler":
-                                createArmyUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "braver")
+                            if b.produce == "settler":
+                                createCivilUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "settler")
                             elif b.produce == "swordsMan":
                                 createArmyUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "swordsMan")
                             elif b.produce == "braver":
                                 createArmyUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "braver")
+                            b.produce = None
+
+                    b.stageRound = b.stageRound - 1
+                    if b.stageRound == 0:
+                        if b.stage == "tribe":
+                            b.stage = "country"
+                            b.image.blit(countryPic, (0, 0))
                 unitNum = 0
             groupLength = len(unit_group.sprites())
             mainScreen.fill((150, 150, 150))  # 循环的绘制部分
