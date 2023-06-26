@@ -126,6 +126,9 @@ class Building(pygame.sprite.Sprite):  # 建筑类
         self.rect = self.image.get_rect()
         self.rect.x = 20 + self.placeX * 70
         self.rect.y = 20 + self.placeY * 70
+        self.produce = None
+        self.restRound = None
+
 
 
 class Block(object):
@@ -194,7 +197,6 @@ def buildingWindow(building):  # 建筑窗口
             buildingText = font.render("城市未在生产", True, BLACK)
         mainScreen.blit(buildingText, (800, 100))
         mainScreen.blit(swordsManPic, swordsManInBuildingArea)
-        textRestStep = font.render("城市剩余血量:" + str(building.life), True, BLACK)
         mainScreen.blit(textRestStep, (800, 100))
         pygame.display.update()
 
