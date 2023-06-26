@@ -91,6 +91,7 @@ class Unit(pygame.sprite.Sprite):
         self.rect.y = 36 + self.placeY * 70
         self.attack = 0
         self.life = 0
+        self.type = None
 
     def dead(self):
         self.remove(unit_group)
@@ -152,10 +153,12 @@ def createArmyUnit(step, x, y, color, group, gamemap, armytype):  # 创建军队
     gamemap[x][y].ifArmyUnit = True
     group.add(unit)
     if armytype == "braver":
+        unit.type = "braver"
         unit.image.blit(braverPic, (0, 0))
         unit.life = 10
         unit.attack = 3
     elif armytype == "swordsMan":
+        unit.type = "swordsMan"
         unit.image.blit(swordsManPic, (0, 0))
         unit.life = 20
         unit.attack = 5
@@ -165,6 +168,7 @@ def createCivilUnit(step, x, y, color, group, gamemap, civilType):  # 创建平�
     unit = Unit(step, color, x, y)
     group.add(unit)
     if civilType == "settler":
+        unit.type = "settler"
         unit.image.blit(settlerPic, (0, 0))
         unit.life = 1
         unit.attack = 0
@@ -314,8 +318,16 @@ if ifGameGoing:
                     nowUnit.move(0, -1, gameMap)
                 elif event.key == pygame.K_DOWN:
                     nowUnit.move(0, 1, gameMap)
-                elif event.key == pygame.K_RETURN:  # 回车下一回合
-                    ifRoundEnd = True
+                elif event.key == pygame.K_RETURN:  # 回车创建城市
+                    if nowUnit.type == "settler":
+                        can_create = True
+                        for unit_city in building_group.sprites():
+                            if unit_city.type == "tribe" and unit_city.placeX == nowUnit.placeX and unit_city.placeY == nowUnit.placeY:
+                                can_create = False        
+                                break
+                        if can_create and nowUnit.restMoveStep != 0:
+                            createBuilding(nowUnit.placeX, nowUnit.placeY, BLACK, building_group, gameMap, "tribe")
+                            nowUnit.kill()
                 elif event.key == pygame.K_j:
                     unitNum -= 1
                     nowUnit = unit_group.sprites()[unitNum % groupLength]
