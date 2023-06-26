@@ -156,6 +156,13 @@ def createArmyUnit(step, x, y, color, group, gamemap, armytype):  # 创建军队
         unit.life = 20
         unit.attack = 5
 
+def createCivilUnit(step, x, y, color, group, gamemap, civiltype):  # 创建平民单位
+    unit = Unit(step, color, x, y)
+    group.add(unit)
+    if civiltype == "settler":
+        unit.image.blit(settlerPic, (0, 0))
+        unit.life = 1
+        unit.attack = 0
 
 def createBuilding(x, y, color, group, gamemap, buildingtype):  # 创建城市
     building = Building(color, x, y)
