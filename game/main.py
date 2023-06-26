@@ -76,6 +76,8 @@ ifGoingtoExit = False
 ifMusicPause = False
 ifRoundEnd = False
 ifBuildingWindow = False
+ifGameWinning = False
+ifGameLose = False
 
 font = pygame.font.SysFont('华文隶书', 40)  # 字体
 
@@ -97,11 +99,22 @@ class Unit(pygame.sprite.Sprite):
         self.type = None
 
     def dead(self):
-        self.remove(unit_group)
+        if self in unit_group:
+            self.remove(unit_group)
+        elif self in unit_group_ai:
+            self.remove(unit_group_ai)
 
     def move(self, xmove, ymove, block):
         if 0 <= self.placeX + xmove <= 9 and 0 <= self.placeY + ymove <= 9:  # 移动是否越界
-            if not block[self.placeX + xmove][self.placeY + ymove].ifArmyUnit:  # 如果移动位置没人 执行移动
+            if self.placeX + xmove == 9 and self.placeY + ymove == 9:
+                self.life -= 10
+                self.restMoveStep = 0
+                if self.life <= 0:
+                    block[self.placeX][self.placeY].ifArmyUnit = False
+                    self.dead()
+                for city in building_group_ai:
+                    city.life -= self.attack
+            elif not block[self.placeX + xmove][self.placeY + ymove].ifArmyUnit:  # 如果移动位置没人 执行移动
                 if block[self.placeX + xmove][self.placeY + ymove].moveCost <= self.restMoveStep:
                     block[self.placeX][self.placeY].ifArmyUnit = False
                     self.placeX += xmove
@@ -111,19 +124,22 @@ class Unit(pygame.sprite.Sprite):
                     self.rect.x = 36 + self.placeX * 70
                     self.rect.y = 36 + self.placeY * 70
             elif self.restMoveStep != 0:  # 如果移动位置有人且剩余步数不为0
-                for unit in unit_group.sprites():  # 遍历组中的成员判断攻击对象
+                canAttack = False
+                for unit in unit_group_ai.sprites():  # 遍历组中的成员判断攻击对象
                     if unit.placeX == self.placeX + xmove and unit.placeY == self.placeY + ymove:
+                        canAttack = True
                         break
-                self.restMoveStep = 0
-                unit.life -= self.attack
-                if unit.life <= 0:
-                    block[unit.placeX][unit.placeY].ifArmyUnit = False
-                    unit.dead()
-                    self.move(xmove, ymove, block)
-                self.life -= unit.attack + 1
-                if self.life <= 0:
-                    block[self.placeX][self.placeY].ifArmyUnit = False
-                    self.dead()
+                if canAttack:
+                    self.restMoveStep = 0
+                    unit.life -= self.attack
+                    if unit.life <= 0:
+                        block[unit.placeX][unit.placeY].ifArmyUnit = False
+                        unit.dead()
+                        self.move(xmove, ymove, block)
+                    self.life -= unit.attack + 1
+                    if self.life <= 0:
+                        block[self.placeX][self.placeY].ifArmyUnit = False
+                        self.dead()
 
 
 class Building(pygame.sprite.Sprite):  # 建筑类
@@ -193,6 +209,10 @@ def createBuilding(x, y, color, group, gamemap, buildingtype):  # 创建城市
         building.image.blit(tribePic, (0, 0))
         building.life = 25
         building.attack = 3
+    elif buildingtype == "AI":
+        building.image.blit(tribePic, (0, 0))
+        building.life = 100
+        building.attack = 10
 
 
 def buildingWindow(building):  # 建筑窗口
@@ -303,19 +323,27 @@ if ifGameGoing:
                 gameMap[i][j].moveCost = 2
             elif ranTemp[i, j] == 2:
                 gameMap[i][j].mapPic = blockSandPic
-                gameMap[i][j].moveCost = 3
+                gameMap[i][j].moveCost = 1
             elif ranTemp[i, j] == 3:
                 gameMap[i][j].mapPic = blockSnowPic
-                gameMap[i][j].moveCost = 4
+                gameMap[i][j].moveCost = 2
     numOfRound = 0
     unitNum = 0
     unit_group = pygame.sprite.Group()
     building_group = pygame.sprite.Group()
+    unit_group_ai = pygame.sprite.Group()
+    building_group_ai = pygame.sprite.Group()
     createCivilUnit(5, 0, 0, RED, unit_group, gameMap, "settler")
-    createCivilUnit(5, 9, 9, BLUE, unit_group, gameMap, "settler")
+    createBuilding(9, 9, BLUE, building_group_ai, gameMap, "AI")
+    for i in ((9, 6), (8, 6), (7, 6), (6, 6), (6, 7), (6, 8), (6, 9)):
+        createArmyUnit(0, i[0], i[1], BLUE, unit_group_ai, gameMap, "braver")
+    for i in ((9, 7), (8, 7), (7, 7), (7, 8), (7, 9)):
+        createArmyUnit(0, i[0], i[1], BLUE, unit_group_ai, gameMap, "rider")
+    for i in ((9, 8), (8, 9), (8, 8)):
+        createArmyUnit(0, i[0], i[1], BLUE, unit_group_ai, gameMap, "swordsMan")
     nowUnit = unit_group.sprites()[unitNum]
 
-    while ifGameGoing:  # 游戏开始循环
+    while ifGameGoing and not ifGameWinning and not ifGameLose:  # 游戏开始循环
         for event in pygame.event.get():
             groupLength = len(unit_group.sprites())
             mousePos = pygame.mouse.get_pos()
@@ -324,30 +352,32 @@ if ifGameGoing:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 ifGameGoing = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    nowUnit.move(-1, 0, gameMap)
-                elif event.key == pygame.K_RIGHT:
-                    nowUnit.move(1, 0, gameMap)
-                elif event.key == pygame.K_UP:
-                    nowUnit.move(0, -1, gameMap)
-                elif event.key == pygame.K_DOWN:
-                    nowUnit.move(0, 1, gameMap)
-                elif event.key == pygame.K_RETURN:  # 回车创建城市
+                if groupLength:
+                    if event.key == pygame.K_LEFT:
+                        nowUnit.move(-1, 0, gameMap)
+                    elif event.key == pygame.K_RIGHT:
+                        nowUnit.move(1, 0, gameMap)
+                    elif event.key == pygame.K_UP:
+                        nowUnit.move(0, -1, gameMap)
+                    elif event.key == pygame.K_DOWN:
+                        nowUnit.move(0, 1, gameMap)
+                if event.key == pygame.K_RETURN:  # 回车创建城市
                     if nowUnit.type == "settler":
                         can_create = True
                         for unit_city in building_group.sprites():
                             if unit_city.type == "tribe" and unit_city.placeX == nowUnit.placeX and unit_city.placeY == nowUnit.placeY:
-                                can_create = False        
+                                can_create = False
                                 break
                         if can_create and nowUnit.restMoveStep != 0:
                             createBuilding(nowUnit.placeX, nowUnit.placeY, nowUnit.color, building_group, gameMap, "tribe")
                             nowUnit.kill()
-                elif event.key == pygame.K_j:
-                    unitNum -= 1
-                    nowUnit = unit_group.sprites()[unitNum % groupLength]
-                elif event.key == pygame.K_k:
-                    unitNum += 1
-                    nowUnit = unit_group.sprites()[unitNum % groupLength]
+                if groupLength:
+                    if event.key == pygame.K_j:
+                        unitNum -= 1
+                        nowUnit = unit_group.sprites()[unitNum % groupLength]
+                    elif event.key == pygame.K_k:
+                        unitNum += 1
+                        nowUnit = unit_group.sprites()[unitNum % groupLength]
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 点击下一回合
                 print(mousePos)  # 打印鼠标位置
                 if nextTurnArea.collidepoint(mousePos):
@@ -371,8 +401,7 @@ if ifGameGoing:
                 numOfRound += 1
                 ifRoundEnd = False
                 for a in unit_group:
-                    if a is nowUnit:
-                        a.restMoveStep = a.maxMoveStep
+                    a.restMoveStep = a.maxMoveStep
                 for b in building_group:
                     if b.produce is not None:
                         b.restRound = b.restRound - 1
@@ -395,6 +424,11 @@ if ifGameGoing:
                             b.life = b.life + 15
                             b.attack = 5
                 unitNum = 0
+            for i in building_group_ai:
+                if i.life <= 0:
+                    ifGameWinning = True
+            if len(building_group) == 0 and len(unit_group) == 0:
+                ifGameLose = True
             groupLength = len(unit_group.sprites())
             mainScreen.fill((150, 150, 150))  # 循环的绘制部分
             textRestStep = font.render("剩余步数:" + str(nowUnit.restMoveStep), True, BLACK)
@@ -422,12 +456,46 @@ if ifGameGoing:
                     # pygame.draw.rect(mainScreen, gameMap[i][j].mapColor, mapBlockDis)
             renderNow = pygame.Rect(34 + nowUnit.placeX * 70, 34 + nowUnit.placeY * 70, 36, 36)
             building_group.draw(mainScreen)
-            pygame.draw.rect(mainScreen, (255, 0, 255), renderNow)
+            building_group_ai.draw(mainScreen)
+            if groupLength != 0:
+                pygame.draw.rect(mainScreen, (255, 0, 255), renderNow)
             unit_group.draw(mainScreen)
+            unit_group_ai.draw(mainScreen)
             for unit_city in building_group.sprites():
                 render = pygame.Rect(20 + unit_city.placeX * 70, 84 + unit_city.placeY * 70, 64, 10)
                 pygame.draw.rect(mainScreen, unit_city.color, render)
+            for unit_city in building_group_ai.sprites():
+                HP = round(unit_city.life / 100 * 64)
+                render = pygame.Rect(20 + unit_city.placeX * 70, 84 + unit_city.placeY * 70, HP, 10)
+                pygame.draw.rect(mainScreen, unit_city.color, render)
             pygame.display.update()
             gameClock.tick(60)
+gameQuit = False
+while ifGameWinning and not gameQuit:
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                gameQuit = True
+        if event.type == pygame.QUIT:  # 退出事件
+            gameQuit = True
+    textWin = pygame.font.SysFont('华文隶书', 200).render("宁赢了", True, RED)
+    textWinEn = pygame.font.SysFont('华文隶书', 100).render("YOU WIN", True, RED)
+    mainScreen.blit(textWin, (300, 200))
+    mainScreen.blit(textWinEn, (380, 400))
+    pygame.display.update()
+    gameClock.tick(60)
+while ifGameLose and not gameQuit:
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                gameQuit = True
+        if event.type == pygame.QUIT:  # 退出事件
+            gameQuit = True
+    textWin = pygame.font.SysFont('华文隶书', 200).render("宁输了", True, RED)
+    textWinEn = pygame.font.SysFont('华文隶书', 100).render("YOU LOST", True, RED)
+    mainScreen.blit(textWin, (300, 200))
+    mainScreen.blit(textWinEn, (370, 400))
+    pygame.display.update()
+    gameClock.tick(60)
 
 pygame.quit()  # 退出程序
