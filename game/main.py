@@ -33,6 +33,8 @@ swordsManPic = pygame.image.load("./image/swordsMan1.png")# 加载剑士
 tribePic = pygame.image.load("./image/tribe.png")# 加载部落
 musicPausePic = pygame.image.load("./image/musicPause.png")# 加载暂停音乐按钮
 musicSkipPic = pygame.image.load("./image/musicSkip.png")# 加载跳过音乐按钮
+settlerInBuildingPic = pygame.image.load("./image/settlerInBuilding.png")# 加载建造中的移民
+settlerPic = pygame.image.load("./image/settler.png")# 加载移民
 
 ##音乐
 musicList = ['China', 'BGM1', 'BGM2', 'BGM3', 'BGM4', 'BGM5', 'BGM6', 'Russia' ]
@@ -51,6 +53,7 @@ exitArea = pygame.Rect(exitArea1, exitArea2)  # 下一回合点击区域
 nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
 musicPauseArea = pygame.Rect((1205, 0), (75, 75))  # 音乐暂停点击区域
 musicSkipArea = pygame.Rect((1130, 0), (75, 75))  # 音乐跳过点击区域
+settlerInBuildingArea = pygame.Rect((40, 60), (280, 300))  # 建造中的移民点击区域
 
 ##tag
 ifGameStarted = False
@@ -59,6 +62,7 @@ ifGoingtoStart = False
 ifGoingtoExit = False
 ifMusicPause = False
 ifRoundEnd = False
+ifBuildingWindow = False
 
 font = pygame.font.SysFont('华文隶书', 40) # 字体
 
@@ -146,6 +150,7 @@ def createBuilding(x, y, color, group, gamemap, buildingtype):#创建城市
     gamemap[x][y].ifBuilding = True
     group.add(building)
     if buildingtype == "tribe":
+        building.type = "tribe"
         building.image.blit(tribePic, (0, 0))
         building.life = 25
         building.attack = 3
@@ -154,15 +159,29 @@ def createBuilding(x, y, color, group, gamemap, buildingtype):#创建城市
 
 def buildingWindow(building):#建筑窗口
     ifSwordsMan = False
-    while 1:
+    ifBuildingWindow = True
+    while ifBuildingWindow:
         for event in pygame.event.get():
             mousePos = pygame.mouse.get_pos()
-            if event.type == pygame.MOUSEMOTION:
-                if startArea.collidepoint(mousePos):
-                    ifGoingtoStart = True    
+            if event.type == pygame.QUIT:
+                ifGameGoing = False
+                ifBuildingWindow = False  
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if settlerInBuildingArea.collidepoint(mousePos):
+                    
+                    ifBuildingWindow = False 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    ifBuildingWindow = False
+            
         if building.type == "county":
             ifSwordsMan = True
         mainScreen.fill(WHITE)
+        mainScreen.blit(settlerInBuildingPic, settlerInBuildingArea)
+        if ifSwordsMan:
+            mainScreen.blit(swordsManPic, (40, 60))
+        textRestStep = font.render("剩余步数:" + str(nowUnit.restMoveStep), True, BLACK)
+        mainScreen.blit(textRestStep, (800, 100))
         pygame.display.update()
 
 while ifGameGoing and not ifGameStarted:  # 主界面循环
