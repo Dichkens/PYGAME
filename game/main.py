@@ -124,12 +124,12 @@ class Unit(pygame.sprite.Sprite):
 
 
 class Building(pygame.sprite.Sprite):  # 建筑类
-    def __init__(self, image, x, y, build_type):
+    def __init__(self, color, x, y, build_type):
         pygame.sprite.Sprite.__init__(self)
         self.placeX = x
         self.placeY = y
         self.image = pygame.Surface([64, 64])
-        self.image.fill(image)
+        self.image.fill(color)
         self.rect = self.image.get_rect()
         self.rect.x = 20 + self.placeX * 70
         self.rect.y = 20 + self.placeY * 70
@@ -150,6 +150,7 @@ class Block(object):
 
 def createArmyUnit(step, x, y, color, group, gamemap, armytype):  # 创建军队单位
     unit = Unit(step, color, x, y)
+    unit.color = color
     gamemap[x][y].ifArmyUnit = True
     group.add(unit)
     if armytype == "braver":
@@ -166,6 +167,7 @@ def createArmyUnit(step, x, y, color, group, gamemap, armytype):  # 创建军队
 
 def createCivilUnit(step, x, y, color, group, gamemap, civilType):  # 创建平民单位
     unit = Unit(step, color, x, y)
+    unit.color = color
     group.add(unit)
     if civilType == "settler":
         unit.type = "settler"
@@ -176,6 +178,7 @@ def createCivilUnit(step, x, y, color, group, gamemap, civilType):  # 创建平�
 
 def createBuilding(x, y, color, group, gamemap, buildingtype):  # 创建城市
     building = Building(color, x, y, buildingtype)
+    building.color = color
     gamemap[x][y].ifBuilding = True
     group.add(building)
     if buildingtype == "tribe":
@@ -324,7 +327,7 @@ if ifGameGoing:
                                 can_create = False        
                                 break
                         if can_create and nowUnit.restMoveStep != 0:
-                            createBuilding(nowUnit.placeX, nowUnit.placeY, BLACK, building_group, gameMap, "tribe")
+                            createBuilding(nowUnit.placeX, nowUnit.placeY, nowUnit.color, building_group, gameMap, "tribe")
                             nowUnit.kill()
                 elif event.key == pygame.K_j:
                     unitNum -= 1
@@ -364,11 +367,11 @@ if ifGameGoing:
                         b.restRound = b.restRound - 1
                         if b.restRound == 0:
                             if b.produce == "settler":
-                                createCivilUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "settler")
+                                createCivilUnit(5, b.placeX, b.placeY, b.color, unit_group, gameMap, "settler")
                             elif b.produce == "swordsMan":
-                                createArmyUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "swordsMan")
+                                createArmyUnit(5, b.placeX, b.placeY, b.color, unit_group, gameMap, "swordsMan")
                             elif b.produce == "braver":
-                                createArmyUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "braver")
+                                createArmyUnit(5, b.placeX, b.placeY, b.color, unit_group, gameMap, "braver")
                             b.produce = None
 
                     b.stageRound = b.stageRound - 1
@@ -406,6 +409,9 @@ if ifGameGoing:
             building_group.draw(mainScreen)
             pygame.draw.rect(mainScreen, (255, 0, 255), renderNow)
             unit_group.draw(mainScreen)
+            for unit_city in building_group.sprites():
+                render = pygame.Rect(20 + unit_city.placeX * 70, 84 + unit_city.placeY * 70, 64, 10)
+                pygame.draw.rect(mainScreen, unit_city.color, render)
             pygame.display.update()
             gameClock.tick(60)
 
