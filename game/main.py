@@ -41,6 +41,7 @@ blockHillPic = pygame.image.load("./image/hill.png")
 blockPlainPic = pygame.image.load("./image/plain.png")
 blockSandPic = pygame.image.load("./image/sand.png")
 blockSnowPic = pygame.image.load("./image/snow.png")
+backPic = pygame.image.load("./image/back.png")
 
 # 音乐
 musicList = ['China', 'BGM1', 'BGM2', 'BGM3', 'BGM4', 'BGM5', 'BGM6', 'Russia']
@@ -56,7 +57,7 @@ exitArea2 = (280, 50)
 # 区域
 startArea = pygame.Rect(startArea1, startArea2)  # 下一回合点击区域
 exitArea = pygame.Rect(exitArea1, exitArea2)  # 下一回合点击区域
-nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
+nextTurnArea = pygame.Rect((1200, 640), windowSize)  # 下一回合点击区域
 musicPauseArea = pygame.Rect((1205, 0), (75, 75))  # 音乐暂停点击区域
 musicSkipArea = pygame.Rect((1130, 0), (75, 75))  # 音乐跳过点击区域
 settlerInBuildingArea = pygame.Rect((40, 60), (280, 300))  # 建造中的移民点击区域
@@ -183,6 +184,8 @@ def buildingWindow(building):  # 建筑窗口
                     if building.produce is None:
                         building.produce = "braver"
                         building.restRound = 3
+                if nextTurnArea.collidepoint(mousePosBuild):
+                    ifBuildingWindow = False
             if event_b.type == pygame.KEYDOWN:
                 if event_b.key == pygame.K_ESCAPE:
                     ifBuildingWindow = False
@@ -199,8 +202,11 @@ def buildingWindow(building):  # 建筑窗口
         else:
             buildingText = font.render("城市未在生产", True, BLACK)
         mainScreen.blit(buildingText, (800, 100))
-        textRestLife = font.render(f"剩余生命值{building.life}", True, BLACK)
+        textRestLife = font.render(f"剩余生命值:{building.life}", True, BLACK)
+        textBuildingtype = font.render(f"建筑类型:{building.type}", True, BLACK)
         mainScreen.blit(textRestLife, (800, 200))
+        mainScreen.blit(textBuildingtype, (800, 300))
+        mainScreen.blit(backPic, (1200, 640))
         pygame.display.update()
 
 
