@@ -28,13 +28,15 @@ startPic = pygame.image.load("./image/start.png")  # 加载开始按钮
 exitPic = pygame.image.load("./image/exit.png")  # 加载离开按钮
 GoingtoStartPic = pygame.image.load("./image/GoingtoStart.png")  # 加载GoingtoStartPic
 GoingtoExitPic = pygame.image.load("./image/GoingtoExit.png")  # 加载GoingtoExitPic
+settlerPic = pygame.image.load("./image/settler.png")  # 加载移民
 braverPic = pygame.image.load("./image/braver1.png")  # 加载勇士
 swordsManPic = pygame.image.load("./image/swordsMan1.png")  # 加载剑士
-tribePic = pygame.image.load("./image/tribe.png")  # 加载部落
+tribePic = pygame.image.load("./image/tribe1.png")  # 加载部落
 musicPausePic = pygame.image.load("./image/musicPause.png")  # 加载暂停音乐按钮
 musicSkipPic = pygame.image.load("./image/musicSkip.png")  # 加载跳过音乐按钮
 settlerInBuildingPic = pygame.image.load("./image/settlerInBuilding.png")  # 加载建造中的移民
-settlerPic = pygame.image.load("./image/settler.png")  # 加载移民
+braverInBuildingPic = pygame.image.load("./image/braverInBuilding.png")  # 加载建造中的勇士
+swordsManInBuildingPic = pygame.image.load("./image/swordsManInBuilding.png")  # 加载建造中的剑士
 
 # 音乐
 musicList = ['China', 'BGM1', 'BGM2', 'BGM3', 'BGM4', 'BGM5', 'BGM6', 'Russia']
@@ -54,6 +56,8 @@ nextTurnArea = pygame.Rect((1200, 600), windowSize)  # 下一回合点击区域
 musicPauseArea = pygame.Rect((1205, 0), (75, 75))  # 音乐暂停点击区域
 musicSkipArea = pygame.Rect((1130, 0), (75, 75))  # 音乐跳过点击区域
 settlerInBuildingArea = pygame.Rect((40, 60), (280, 300))  # 建造中的移民点击区域
+braverInBuildingArea = pygame.Rect((360, 60), (600, 300))  # 建造中的勇士点击区域
+swordsManInBuildingArea = pygame.Rect((40, 420), (280, 660))  # 建造中的剑士点击区域
 
 # tag
 ifGameStarted = False
@@ -117,11 +121,11 @@ class Building(pygame.sprite.Sprite):  # 建筑类
         pygame.sprite.Sprite.__init__(self)
         self.placeX = x
         self.placeY = y
-        self.image = pygame.Surface([60, 40])
+        self.image = pygame.Surface([64,64])
         self.image.fill(image)
         self.rect = self.image.get_rect()
-        self.rect.x = 22 + self.placeX * 70
-        self.rect.y = 32 + self.placeY * 70
+        self.rect.x = 20 + self.placeX * 70
+        self.rect.y = 20 + self.placeY * 70
 
 
 class Block(object):
@@ -179,9 +183,10 @@ def buildingWindow(building):  # 建筑窗口
             ifSwordsMan = True
         mainScreen.fill(WHITE)
         mainScreen.blit(settlerInBuildingPic, settlerInBuildingArea)
+        mainScreen.blit(braverInBuildingPic, braverInBuildingArea)
         if ifSwordsMan:
-            mainScreen.blit(swordsManPic, (40, 60))
-        textRestStep = font.render("剩余步数:" + str(nowUnit.restMoveStep), True, BLACK)
+            mainScreen.blit(swordsManPic, swordsManInBuildingArea)
+        textRestStep = font.render("城市剩余血量:" + str(building.life), True, BLACK)
         mainScreen.blit(textRestStep, (800, 100))
         pygame.display.update()
 
