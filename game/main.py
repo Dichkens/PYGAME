@@ -122,6 +122,8 @@ class Building(pygame.sprite.Sprite):  # 建筑类
         self.rect = self.image.get_rect()
         self.rect.x = 22 + self.placeX * 70
         self.rect.y = 32 + self.placeY * 70
+        self.produce = None
+        self.restRound = None
 
 
 class Block(object):
@@ -170,7 +172,9 @@ def buildingWindow(building):  # 建筑窗口
                 ifBuildingWindow = False
             if event_b.type == pygame.MOUSEBUTTONDOWN and event_b.button == 1:
                 if settlerInBuildingArea.collidepoint(mousePosBuild):
-                    ifBuildingWindow = False
+                    if building.produce is None:
+                        building.produce = "braver"
+                        building.restRound = 3
             if event_b.type == pygame.KEYDOWN:
                 if event_b.key == pygame.K_ESCAPE:
                     ifBuildingWindow = False
@@ -181,8 +185,11 @@ def buildingWindow(building):  # 建筑窗口
         mainScreen.blit(settlerInBuildingPic, settlerInBuildingArea)
         if ifSwordsMan:
             mainScreen.blit(swordsManPic, (40, 60))
-        textRestStep = font.render("剩余步数:" + str(nowUnit.restMoveStep), True, BLACK)
-        mainScreen.blit(textRestStep, (800, 100))
+        if building.produce is not None:
+            buildingText = font.render(f"正在生产{building.produce}\n剩余回合{building.restRound}", True, BLACK)
+        else:
+            buildingText = font.render("城市未在生产", True, BLACK)
+        mainScreen.blit(buildingText, (800, 100))
         pygame.display.update()
 
 
@@ -300,6 +307,12 @@ if ifGameGoing:
                 for a in unit_group:
                     if a is nowUnit:
                         a.restMoveStep = a.maxMoveStep
+                for b in building_group:
+                    if b.produce is not None:
+                        b.restRound = b.restRound - 1
+                        if b.restRound == 0:
+                            if b.produce == "braver":
+                                createArmyUnit(5, b.placeX, b.placeY, BLACK, unit_group, gameMap, "braver")
                 unitNum = 0
             groupLength = len(unit_group.sprites())
             mainScreen.fill((150, 150, 150))  # 循环的绘制部分
@@ -326,8 +339,8 @@ if ifGameGoing:
                     mapBlockDis = pygame.Rect(20 + i * 70, 20 + j * 70, 64, 64)
                     pygame.draw.rect(mainScreen, gameMap[i][j].mapColor, mapBlockDis)
             renderNow = pygame.Rect(34 + nowUnit.placeX * 70, 34 + nowUnit.placeY * 70, 36, 36)
-            pygame.draw.rect(mainScreen, (255, 0, 255), renderNow)
             building_group.draw(mainScreen)
+            pygame.draw.rect(mainScreen, (255, 0, 255), renderNow)
             unit_group.draw(mainScreen)
             pygame.display.update()
             gameClock.tick(60)
