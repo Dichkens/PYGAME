@@ -190,14 +190,14 @@ def buildingWindow(building):  # 建筑窗口
         mainScreen.blit(settlerInBuildingPic, settlerInBuildingArea)
         mainScreen.blit(braverInBuildingPic, braverInBuildingArea)
         if ifSwordsMan:
-            mainScreen.blit(swordsManPic, (40, 60))
+            mainScreen.blit(swordsManInBuildingPic, swordsManInBuildingArea)
         if building.produce is not None:
             buildingText = font.render(f"正在生产{building.produce}\n剩余回合{building.restRound}", True, BLACK)
         else:
             buildingText = font.render("城市未在生产", True, BLACK)
         mainScreen.blit(buildingText, (800, 100))
-        mainScreen.blit(swordsManPic, swordsManInBuildingArea)
-        mainScreen.blit(textRestStep, (800, 100))
+        textRestLife = font.render(f"剩余生命值{building.life}", True, BLACK)
+        mainScreen.blit(textRestLife, (800, 200))
         pygame.display.update()
 
 
