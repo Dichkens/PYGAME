@@ -295,10 +295,8 @@ if ifGameGoing:
     unitNum = 0
     unit_group = pygame.sprite.Group()
     building_group = pygame.sprite.Group()
-    createArmyUnit(5, 5, 5, BLACK, unit_group, gameMap, "braver")
-    createArmyUnit(5, 4, 5, BLACK, unit_group, gameMap, "braver")
-    createArmyUnit(5, 3, 5, BLACK, unit_group, gameMap, "swordsMan")
-    createBuilding(5, 7, BLACK, building_group, gameMap, "tribe")
+    createCivilUnit(5, 0, 0, RED, unit_group, gameMap, "settler")
+    createCivilUnit(5, 9, 9, BLUE, unit_group, gameMap, "settler")
     nowUnit = unit_group.sprites()[unitNum]
 
     while ifGameGoing:  # 游戏开始循环
