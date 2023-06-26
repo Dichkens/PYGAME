@@ -137,7 +137,7 @@ class Building(pygame.sprite.Sprite):  # 建筑类
         self.restRound = None
         self.type = build_type
         self.stage = "tribe"
-        self.stageRound = 10
+        self.stageRound = 30
 
 
 class Block(object):
@@ -202,15 +202,15 @@ def buildingWindow(building):  # 建筑窗口
                 if settlerInBuildingArea.collidepoint(mousePosBuild):
                     if building.produce is None:
                         building.produce = "settler"
-                        building.restRound = 5
+                        building.restRound = 10
                 elif braverInBuildingArea.collidepoint(mousePosBuild):
                     if building.produce is None:
                         building.produce = "braver"
-                        building.restRound = 3
+                        building.restRound = 7
                 elif swordsManInBuildingArea.collidepoint(mousePosBuild):
                     if building.produce is None:
                         building.produce = "swordsMan"
-                        building.restRound = 5
+                        building.restRound = 16
                 elif nextTurnArea.collidepoint(mousePosBuild):
                     ifBuildingWindow = False
             if event_b.type == pygame.KEYDOWN:
@@ -392,7 +392,7 @@ if ifGameGoing:
                                       True, BLACK)
                 textUnitHealth = font.render("生命值:" + str(nowUnit.life), True, BLACK)
             else:
-                textNow = font.render("当前单位为0!,全死了", True, BLACK)
+                textNow = font.render("没有可选单位", True, BLACK)
                 textUnitHealth = font.render("生命值无", True, BLACK)
             mainScreen.blit(textNow, (800, 300))
             mainScreen.blit(textUnitHealth, (800, 400))
