@@ -105,7 +105,7 @@ class Unit(pygame.sprite.Sprite):
             self.remove(unit_group_ai)
 
     def move(self, xmove, ymove, block):
-        if 0 <= self.placeX + xmove <= 9 and 0 <= self.placeY + ymove <= 9:  # 移动是否越界
+        if 0 <= self.placeX + xmove <= 9 and 0 <= self.placeY + ymove <= 9 and not self.restMoveStep == 0:  # 移动是否越界
             if self.placeX + xmove == 9 and self.placeY + ymove == 9:
                 self.life -= 10
                 self.restMoveStep = 0
