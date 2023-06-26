@@ -31,6 +31,7 @@ GoingtoExitPic = pygame.image.load("./image/GoingtoExit.png")  # 加载GoingtoEx
 settlerPic = pygame.image.load("./image/settler.png")  # 加载移民
 braverPic = pygame.image.load("./image/braver1.png")  # 加载勇士
 swordsManPic = pygame.image.load("./image/swordsMan1.png")  # 加载剑士
+riderPic = pygame.image.load("./image/rider.png")  # 加载骑兵
 tribePic = pygame.image.load("./image/tribe1.png")  # 加载部落
 countryPic = pygame.image.load("./image/country.png")
 musicPausePic = pygame.image.load("./image/musicPause.png")  # 加载暂停音乐按钮
@@ -38,6 +39,7 @@ musicSkipPic = pygame.image.load("./image/musicSkip.png")  # 加载跳过音乐�
 settlerInBuildingPic = pygame.image.load("./image/settlerInBuilding.png")  # 加载建造中的移民
 braverInBuildingPic = pygame.image.load("./image/braverInBuilding.png")  # 加载建造中的勇士
 swordsManInBuildingPic = pygame.image.load("./image/swordsManInBuilding.png")  # 加载建造中的剑士
+riderInBuildingPic = pygame.image.load("./image/riderInBuilding.png")  # 加载建造中的骑兵
 blockHillPic = pygame.image.load("./image/hill.png")
 blockPlainPic = pygame.image.load("./image/plain.png")
 blockSandPic = pygame.image.load("./image/sand.png")
@@ -64,6 +66,7 @@ musicSkipArea = pygame.Rect((1130, 0), (75, 75))  # 音乐跳过点击区域
 settlerInBuildingArea = pygame.Rect((40, 60), (280, 300))  # 建造中的移民点击区域
 braverInBuildingArea = pygame.Rect((360, 60), (600, 300))  # 建造中的勇士点击区域
 swordsManInBuildingArea = pygame.Rect((40, 420), (280, 660))  # 建造中的剑士点击区域
+riderInBuildingArea = pygame.Rect((360, 420), (600, 660))  # 建造中的骑兵点击区域
 
 # tag
 ifGameStarted = False
@@ -156,13 +159,18 @@ def createArmyUnit(step, x, y, color, group, gamemap, armytype):  # 创建军队
     if armytype == "braver":
         unit.type = "braver"
         unit.image.blit(braverPic, (0, 0))
-        unit.life = 10
-        unit.attack = 3
+        unit.life = 15
+        unit.attack = 4
     elif armytype == "swordsMan":
         unit.type = "swordsMan"
         unit.image.blit(swordsManPic, (0, 0))
-        unit.life = 20
-        unit.attack = 5
+        unit.life = 30
+        unit.attack = 8
+    elif armytype == "rider":
+        unit.type = "rider"
+        unit.image.blit(riderPic, (0, 0))
+        unit.life = 25
+        unit.attack = 6
 
 
 def createCivilUnit(step, x, y, color, group, gamemap, civilType):  # 创建平民单位
@@ -190,7 +198,7 @@ def createBuilding(x, y, color, group, gamemap, buildingtype):  # 创建城市
 def buildingWindow(building):  # 建筑窗口
     global ifBuildingWindow
     global ifGameGoing
-    ifSwordsMan = False
+    ifCountry = False
     ifBuildingWindow = True
     while ifBuildingWindow:
         for event_b in pygame.event.get():
@@ -210,7 +218,11 @@ def buildingWindow(building):  # 建筑窗口
                 elif swordsManInBuildingArea.collidepoint(mousePosBuild):
                     if building.produce is None:
                         building.produce = "swordsMan"
-                        building.restRound = 16
+                        building.restRound = 15
+                elif riderInBuildingArea.collidepoint(mousePosBuild):
+                    if building.produce is None:
+                        building.produce = "rider"
+                        building.restRound = 13
                 elif nextTurnArea.collidepoint(mousePosBuild):
                     ifBuildingWindow = False
             if event_b.type == pygame.KEYDOWN:
@@ -218,12 +230,13 @@ def buildingWindow(building):  # 建筑窗口
                     ifBuildingWindow = False
 
         if building.stage == "country":
-            ifSwordsMan = True
+            ifCountry = True
         mainScreen.fill(WHITE)
         mainScreen.blit(settlerInBuildingPic, settlerInBuildingArea)
         mainScreen.blit(braverInBuildingPic, braverInBuildingArea)
-        if ifSwordsMan:
+        if ifCountry:
             mainScreen.blit(swordsManInBuildingPic, swordsManInBuildingArea)
+            mainScreen.blit(riderInBuildingPic, riderInBuildingArea)
         if building.produce is not None:
             buildingText = font.render(f"正在生产{building.produce}", True, BLACK)
             buildingProgressText = font.render(f"剩余回合{building.restRound}", True, BLACK)
@@ -335,8 +348,6 @@ if ifGameGoing:
                 elif event.key == pygame.K_k:
                     unitNum += 1
                     nowUnit = unit_group.sprites()[unitNum % groupLength]
-                elif event.key == pygame.K_a:
-                    createArmyUnit(5, 3, 3, BLACK, unit_group, gameMap, "braver")
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # 点击下一回合
                 print(mousePos)  # 打印鼠标位置
                 if nextTurnArea.collidepoint(mousePos):
@@ -372,6 +383,8 @@ if ifGameGoing:
                                 createArmyUnit(5, b.placeX, b.placeY, b.color, unit_group, gameMap, "swordsMan")
                             elif b.produce == "braver":
                                 createArmyUnit(5, b.placeX, b.placeY, b.color, unit_group, gameMap, "braver")
+                            elif b.produce == "rider":
+                                createArmyUnit(8, b.placeX, b.placeY, b.color, unit_group, gameMap, "rider")
                             b.produce = None
 
                     b.stageRound = b.stageRound - 1
@@ -379,6 +392,8 @@ if ifGameGoing:
                         if b.stage == "tribe":
                             b.stage = "country"
                             b.image.blit(countryPic, (0, 0))
+                            b.life = b.life + 15
+                            b.attack = 5
                 unitNum = 0
             groupLength = len(unit_group.sprites())
             mainScreen.fill((150, 150, 150))  # 循环的绘制部分
