@@ -200,13 +200,17 @@ def buildingWindow(building):  # 建筑窗口
                     if building.produce is None:
                         building.produce = "braver"
                         building.restRound = 3
+                elif swordsManInBuildingArea.collidepoint(mousePosBuild):
+                    if building.produce is None:
+                        building.produce = "swordsMan"
+                        building.restRound = 5
                 elif nextTurnArea.collidepoint(mousePosBuild):
                     ifBuildingWindow = False
             if event_b.type == pygame.KEYDOWN:
                 if event_b.key == pygame.K_ESCAPE:
                     ifBuildingWindow = False
 
-        if building.type == "county":
+        if building.stage == "country":
             ifSwordsMan = True
         mainScreen.fill(WHITE)
         mainScreen.blit(settlerInBuildingPic, settlerInBuildingArea)
@@ -214,17 +218,20 @@ def buildingWindow(building):  # 建筑窗口
         if ifSwordsMan:
             mainScreen.blit(swordsManInBuildingPic, swordsManInBuildingArea)
         if building.produce is not None:
-            buildingText = font.render(f"正在生产{building.produce}\n剩余回合{building.restRound}", True, BLACK)
+            buildingText = font.render(f"正在生产{building.produce}", True, BLACK)
+            buildingProgressText = font.render(f"剩余回合{building.restRound}", True, BLACK)
         else:
             buildingText = font.render("城市未在生产", True, BLACK)
         mainScreen.blit(buildingText, (800, 100))
         textRestLife = font.render(f"剩余生命值:{building.life}", True, BLACK)
         textBuildingtype = font.render(f"建筑类型:{building.type}", True, BLACK)
         textBuildingUpdate = font.render(f"距离建筑升级:{building.stageRound}", True, BLACK)
-        mainScreen.blit(textRestLife, (800, 200))
-        mainScreen.blit(textBuildingtype, (800, 300))
+        if building.produce is not None:
+            mainScreen.blit(buildingProgressText, (800, 200))
+        mainScreen.blit(textRestLife, (800, 300))
+        mainScreen.blit(textBuildingtype, (800, 400))
         mainScreen.blit(backPic, (1200, 640))
-        mainScreen.blit(textBuildingUpdate, (800, 400))
+        mainScreen.blit(textBuildingUpdate, (800, 500))
         pygame.display.update()
 
 
