@@ -37,6 +37,10 @@ musicSkipPic = pygame.image.load("./image/musicSkip.png")  # 加载跳过音乐�
 settlerInBuildingPic = pygame.image.load("./image/settlerInBuilding.png")  # 加载建造中的移民
 braverInBuildingPic = pygame.image.load("./image/braverInBuilding.png")  # 加载建造中的勇士
 swordsManInBuildingPic = pygame.image.load("./image/swordsManInBuilding.png")  # 加载建造中的剑士
+blockHillPic = pygame.image.load("./image/hill.png")
+blockPlainPic = pygame.image.load("./image/plain.png")
+blockSandPic = pygame.image.load("./image/sand.png")
+blockSnowPic = pygame.image.load("./image/snow.png")
 
 # 音乐
 musicList = ['China', 'BGM1', 'BGM2', 'BGM3', 'BGM4', 'BGM5', 'BGM6', 'Russia']
@@ -121,7 +125,7 @@ class Building(pygame.sprite.Sprite):  # 建筑类
         pygame.sprite.Sprite.__init__(self)
         self.placeX = x
         self.placeY = y
-        self.image = pygame.Surface([64,64])
+        self.image = pygame.Surface([64, 64])
         self.image.fill(image)
         self.rect = self.image.get_rect()
         self.rect.x = 20 + self.placeX * 70
@@ -130,11 +134,10 @@ class Building(pygame.sprite.Sprite):  # 建筑类
         self.restRound = None
 
 
-
 class Block(object):
     def __init__(self):
         self.moveCost = 1
-        self.mapColor = WHITE
+        self.mapPic = None
         self.ifArmyUnit = False
         self.ifBuilding = False
 
@@ -242,16 +245,16 @@ if ifGameGoing:
     for i in range(10):
         for j in range(10):  # 根据随机数生成地形
             if ranTemp[i, j] == 0:
-                gameMap[i][j].mapColor = WHITE
+                gameMap[i][j].mapPic = blockPlainPic
                 gameMap[i][j].moveCost = 1
             elif ranTemp[i, j] == 1:
-                gameMap[i][j].mapColor = GREEN
+                gameMap[i][j].mapPic = blockHillPic
                 gameMap[i][j].moveCost = 2
             elif ranTemp[i, j] == 2:
-                gameMap[i][j].mapColor = BLUE
+                gameMap[i][j].mapPic = blockSandPic
                 gameMap[i][j].moveCost = 3
             elif ranTemp[i, j] == 3:
-                gameMap[i][j].mapColor = RED
+                gameMap[i][j].mapPic = blockSnowPic
                 gameMap[i][j].moveCost = 4
     numOfRound = 0
     unitNum = 0
@@ -344,8 +347,9 @@ if ifGameGoing:
 
             for i in range(10):
                 for j in range(10):
-                    mapBlockDis = pygame.Rect(20 + i * 70, 20 + j * 70, 64, 64)
-                    pygame.draw.rect(mainScreen, gameMap[i][j].mapColor, mapBlockDis)
+                    mainScreen.blit(gameMap[i][j].mapPic, (20 + i * 70, 20 + j * 70))
+                    # mapBlockDis = pygame.Rect(20 + i * 70, 20 + j * 70, 64, 64)
+                    # pygame.draw.rect(mainScreen, gameMap[i][j].mapColor, mapBlockDis)
             renderNow = pygame.Rect(34 + nowUnit.placeX * 70, 34 + nowUnit.placeY * 70, 36, 36)
             building_group.draw(mainScreen)
             pygame.draw.rect(mainScreen, (255, 0, 255), renderNow)
